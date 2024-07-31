@@ -6,7 +6,7 @@ app.disable('x-powered-by');
 app.use(corsMiddleware());
 app.use(json());
 
-app.get('/', (req, res) => {
+app.get('/category', (req, res) => {
   res.json({ message: 'Hello World!' });
 });
 // run server
