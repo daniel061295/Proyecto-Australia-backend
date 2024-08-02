@@ -21,7 +21,8 @@ export class Category extends Model {
     }
   }
 
-  static async post({ nameCategory }) {
+  static async create({ input }) {
+    const { nameCategory } = input;
     try {
       const category = await this.create({ name_category: nameCategory });
       const plainCategory = category.get({ plain: true });
@@ -31,7 +32,9 @@ export class Category extends Model {
     }
   }
 
-  static async put({ idCategory, nameCategory }) {
+  static async update({ id, input }) {
+    const idCategory = id;
+    const { nameCategory } = input;
     try {
       await this.update({ name_category: nameCategory }, { where: { id_category: idCategory } });
       const { status, category } = await this.getById({ idCategory });
@@ -69,8 +72,8 @@ Category.init(
   }
 );
 
-// // test post
-// Category.post({
+// // test create
+// Category.create({
 //   nameCategory: 'blobCategory'
 // }).then((result) => { console.log('Category:', result); });
 
@@ -80,8 +83,8 @@ Category.init(
 // test getById
 // Category.getById({ idClient: 1 }).then((result) => { console.log('Category:', result); });
 
-// test put
-// Category.put({
+// test update
+// Category.update({
 //   idCategory: 1,
 //   nameCategory: 'newBlobCategory'
 // }).then((result) => { console.log('Category:', result); });

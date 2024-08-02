@@ -97,13 +97,13 @@ User.init(
 );
 
 // // test post
-User.post({
-  nameUser: 'blobUser',
-  passwordUser: 'blobUserPassword',
-  emailUser: 'blobUserEmail',
-  tokenUser: 'blobUserToken',
-  profileId: 1
-}).then((result) => { console.log('User:', result); });
+// User.post({
+//   nameUser: 'blobUser',
+//   passwordUser: 'blobUserPassword',
+//   emailUser: 'blobUserEmail',
+//   tokenUser: 'blobUserToken',
+//   profileId: 1
+// }).then((result) => { console.log('User:', result); });
 
 // test getAll
 // User.getAll().then((result) => { console.log('User:', result); });
