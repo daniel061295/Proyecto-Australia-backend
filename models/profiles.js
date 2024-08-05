@@ -2,7 +2,7 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database.js';
 
-export class Profile extends Model {
+export class ProfileModel extends Model {
   static async getAll() {
     try {
       const profiles = await this.findAll({ raw: true });
@@ -12,16 +12,18 @@ export class Profile extends Model {
     }
   }
 
-  static async getById({ idProfile }) {
+  static async getById({ id }) {
     try {
-      const profile = await this.findByPk(idProfile, { raw: true });
-      return { status: true, profile };
+      const profile = await this.findByPk(id, { raw: true });
+      if (profile !== null) return { status: true, profile };
+      return { status: false, message: 'Profile not found!' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async post({ nameProfile }) {
+  static async createNew({ input }) {
+    const { nameProfile } = input;
     try {
       const profile = await this.create({ name_profile: nameProfile });
       const plainProfile = profile.get({ plain: true });
@@ -31,26 +33,28 @@ export class Profile extends Model {
     }
   }
 
-  static async put({ idProfile, nameProfile }) {
+  static async updateByPk({ id, input }) {
+    const { nameProfile } = input;
     try {
-      await this.update({ name_profile: nameProfile }, { where: { id_profile: idProfile } });
-      const { status, profile } = await this.getById({ idProfile });
-      return { status, profile };
+      await this.update({ name_profile: nameProfile }, { where: { id_profile: id } });
+      const { status, profile, message } = await this.getById({ id });
+      if (status) { return { status, profile }; }
+      return { status, message };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async delete({ idProfile }) {
+  static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_profile: idProfile } });
+      await this.destroy({ where: { id_profile: id } });
       return { status: true, message: 'Profile deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 }
-Profile.init(
+ProfileModel.init(
 
   {
     id_profile: {
@@ -68,23 +72,3 @@ Profile.init(
     modelName: 'Profile'
   }
 );
-
-// // test post
-// Profile.post({
-//   nameProfile: 'blobProfile'
-// }).then((result) => { console.log('Profile:', result); });
-
-// test getAll
-// Profile.getAll().then((result) => { console.log('Profile:', result); });
-
-// test getById
-// Profile.getById({ idProfile: 1 }).then((result) => { console.log('Profile:', result); });
-
-// test put
-// Profile.put({
-//   idProfile: 1,
-//   nameProfile: 'newBlobProfile'
-// }).then((result) => { console.log('Profile:', result); });
-
-// test delete
-// Profile.delete({ idProfile: 1 }).then((result) => { console.log('Profile:', result); });

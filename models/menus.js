@@ -2,7 +2,7 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database.js';
 
-export class Menu extends Model {
+export class MenuModel extends Model {
   static async getAll() {
     try {
       const menus = await this.findAll({ raw: true });
@@ -12,16 +12,18 @@ export class Menu extends Model {
     }
   }
 
-  static async getById({ idMenu }) {
+  static async getById({ id }) {
     try {
-      const menu = await this.findByPk(idMenu, { raw: true });
-      return { status: true, menu };
+      const menu = await this.findByPk(id, { raw: true });
+      if (menu !== null) return { status: true, menu };
+      return { status: false, message: 'Menu not found!' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async post({ nameMenu }) {
+  static async createNew({ input }) {
+    const { nameMenu } = input;
     try {
       const menu = await this.create({ name_menu: nameMenu });
       const plainMenu = menu.get({ plain: true });
@@ -31,26 +33,28 @@ export class Menu extends Model {
     }
   }
 
-  static async put({ idMenu, nameMenu }) {
+  static async updateByPk({ id, input }) {
+    const { nameMenu } = input;
     try {
-      await this.update({ name_menu: nameMenu }, { where: { id_menu: idMenu } });
-      const { status, menu } = await this.getById({ idMenu });
-      return { status, menu };
+      await this.update({ name_menu: nameMenu }, { where: { id_menu: id } });
+      const { status, menu, message } = await this.getById({ id });
+      if (status) { return { status, menu }; }
+      return { status, message };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async delete({ idMenu }) {
+  static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_menu: idMenu } });
+      await this.destroy({ where: { id_menu: id } });
       return { status: true, message: 'Menu deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 }
-Menu.init(
+MenuModel.init(
 
   {
     id_menu: {
@@ -68,23 +72,3 @@ Menu.init(
     modelName: 'Menu'
   }
 );
-
-// // test post
-// Menu.post({
-//   nameMenu: 'blobMenu'
-// }).then((result) => { console.log('Menu:', result); });
-
-// test getAll
-// Menu.getAll().then((result) => { console.log('Menu:', result); });
-
-// test getById
-// Menu.getById({ idMenu: 1 }).then((result) => { console.log('Menu:', result); });
-
-// test put
-// Menu.put({
-//   idMenu: 1,
-//   nameMenu: 'newBlobMenu'
-// }).then((result) => { console.log('Menu:', result); });
-
-// test delete
-// Menu.delete({ idMenu: 1 }).then((result) => { console.log('Menu:', result); });

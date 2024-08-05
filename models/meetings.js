@@ -2,7 +2,7 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database.js';
 
-export class Meeting extends Model {
+export class MeetingModel extends Model {
   static async getAll() {
     try {
       const meetings = await this.findAll({ raw: true });
@@ -12,16 +12,23 @@ export class Meeting extends Model {
     }
   }
 
-  static async getById({ idMeeting }) {
+  static async getById({ id }) {
     try {
-      const meeting = await this.findByPk(idMeeting, { raw: true });
-      return { status: true, meeting };
+      const meeting = await this.findByPk(id, { raw: true });
+      if (meeting !== null) return { status: true, meeting };
+      return { status: false, message: 'Meeting not found!' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async post({ dateTimeMeeting, stateId, clientId, serviceId }) {
+  static async createNew({ input }) {
+    const {
+      dateTimeMeeting,
+      stateId,
+      clientId,
+      serviceId
+    } = input;
     try {
       const meeting = await this.create({
         date_time_meeting: dateTimeMeeting,
@@ -36,32 +43,39 @@ export class Meeting extends Model {
     }
   }
 
-  static async put({ idMeeting, dateTimeMeeting, stateId, clientId, serviceId }) {
+  static async updateByPk({ id, input }) {
+    const {
+      dateTimeMeeting,
+      stateId,
+      clientId,
+      serviceId
+    } = input;
     try {
       await this.update({
-        id_meeting: idMeeting,
+        id_meeting: id,
         date_time_meeting: dateTimeMeeting,
         state_id: stateId,
         client_id: clientId,
         service_id: serviceId
-      }, { where: { id_meeting: idMeeting } });
-      const { status, meeting } = await this.getById({ idMeeting });
-      return { status, meeting };
+      }, { where: { id_meeting: id } });
+      const { status, meeting, message } = await this.getById({ id });
+      if (status) { return { status, meeting }; }
+      return { status, message };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async delete({ idMeeting }) {
+  static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_meeting: idMeeting } });
+      await this.destroy({ where: { id_meeting: id } });
       return { status: true, message: 'Meeting deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 }
-Meeting.init(
+MeetingModel.init(
 
   {
     id_meeting: {
@@ -91,29 +105,3 @@ Meeting.init(
     modelName: 'Meeting'
   }
 );
-
-// test post
-// Meeting.post({
-//   dateTimeMeeting: '2016-05-23 10:39:21',
-//   stateId: 1,
-//   clientId: 1,
-//   serviceId: 1
-// }).then((result) => { console.log('Meeting:', result); });
-
-// test getAll
-// Meeting.getAll().then((result) => { console.log('Meeting:', result); });
-
-// test getById
-// Meeting.getById({ idMeeting: 1 }).then((result) => { console.log('Meeting:', result); });
-
-// test put
-// Meeting.put({
-//   idMeeting: 2,
-//   dateTimeMeeting: '2024-08-02 10:39:21',
-//   stateId: 1,
-//   clientId: 1,
-//   serviceId: 1
-// }).then((result) => { console.log('Meeting:', result); });
-
-// test delete
-// Meeting.delete({ idMeeting: 2 }).then((result) => { console.log('Meeting:', result); });

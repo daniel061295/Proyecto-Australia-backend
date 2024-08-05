@@ -9,7 +9,7 @@ export class CategoryController {
   getAll = async (req, res) => {
     const { status, categories } = await this.categoryModel.getAll();
     if (status) return res.json(categories);
-    res.status(500).json({ message: 'Error on get category' });
+    res.status(500).json({ message: `Error on get category: ${categories}` });
   };
 
   getById = async (req, res) => {
@@ -25,11 +25,9 @@ export class CategoryController {
     if (!result.success) {
       return res.status(422).json({ error: JSON.parse(result.error.message) });
     }
-
-    const { status, newCategory } = await this.categoryModel.create({ input: result.data });
-
-    if (status) return res.status(201).json(newCategory);
-    res.status(500).json({ message: 'Error on creating category' });
+    const { status, category } = await this.categoryModel.createNew({ input: result.data });
+    if (status) return res.status(201).json(category);
+    res.status(500).json({ message: `Error creating category: ${category}` });
   };
 
   delete = async (req, res) => {
@@ -52,10 +50,10 @@ export class CategoryController {
     }
 
     const { id } = req.params;
+    const { status, category, message } = await this.categoryModel.updateByPk({ id, input: result.data });
 
-    const { status, updatedCategory } = await this.categoryModel.update({ id, input: result.data });
-
-    if (status) return res.status(201).json(updatedCategory);
+    if (status) return res.status(201).json(category);
+    if (message) return res.status(404).json({ message });
     res.status(500).json({ message: 'Error on updating category' });
   };
 }

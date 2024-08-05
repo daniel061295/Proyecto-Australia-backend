@@ -1,20 +1,29 @@
+/* eslint-disable space-before-function-paren */
 import { z } from 'zod';
 
 export const meetingSchema = z.object({
-  date_time_meeting: z.string({
-    invalid_type_error: 'name_category must be a string',
-    required_error: 'name_category is required'
-  }).datetime({ message: 'date_time_meeting must be a valid date time format: YYYY-MM-DDTHH:mm:ssZ' }),
-  state_id: z.number({
-    invalid_type_error: 'state_id must be a number',
-    required_error: 'state_id is required'
+  dateTimeMeeting: z.string({
+    invalid_type_error: 'dateTimeMeeting must be a string',
+    required_error: 'nameCategory is required'
+  }).datetime({ message: 'dateTimeMeeting must be a valid date time format: YYYY-MM-DDTHH:mm:ssZ' }),
+  stateId: z.number({
+    invalid_type_error: 'stateId must be a number',
+    required_error: 'stateId is required'
   }),
-  client_id: z.number({
-    invalid_type_error: 'client_id must be a number',
-    required_error: 'client_id is required'
+  clientId: z.number({
+    invalid_type_error: 'clientId must be a number',
+    required_error: 'clientId is required'
   }),
-  service_id: z.number({
-    invalid_type_error: 'service_id must be a number',
-    required_error: 'service_id is required'
+  serviceId: z.number({
+    invalid_type_error: 'serviceId must be a number',
+    required_error: 'serviceId is required'
   })
 });
+
+export function validateMeeting(input) {
+  return meetingSchema.safeParse(input);
+}
+
+export function validatePartialMeeting(input) {
+  return meetingSchema.partial().safeParse(input);
+}

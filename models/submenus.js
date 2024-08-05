@@ -2,7 +2,7 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database.js';
 
-export class Submenu extends Model {
+export class SubmenuModel extends Model {
   static async getAll() {
     try {
       const submenus = await this.findAll({ raw: true });
@@ -12,16 +12,21 @@ export class Submenu extends Model {
     }
   }
 
-  static async getById({ idSubmenu }) {
+  static async getById({ id }) {
     try {
-      const submenu = await this.findByPk(idSubmenu, { raw: true });
-      return { status: true, submenu };
+      const submenu = await this.findByPk(id, { raw: true });
+      if (submenu !== null) return { status: true, submenu };
+      return { status: false, message: 'Submenu not found!' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async post({ nameSubmenu, menuId }) {
+  static async createNew({ input }) {
+    const {
+      nameSubmenu,
+      menuId
+    } = input;
     try {
       const submenu = await this.create({
         name_submenu: nameSubmenu,
@@ -34,29 +39,34 @@ export class Submenu extends Model {
     }
   }
 
-  static async put({ idSubmenu, nameSubmenu, menuId }) {
+  static async updateByPk({ id, input }) {
+    const {
+      nameSubmenu,
+      menuId
+    } = input;
     try {
       await this.update({
         name_submenu: nameSubmenu,
         menu_id: menuId
-      }, { where: { id_submenu: idSubmenu } });
-      const { status, submenu } = await this.getById({ idSubmenu });
-      return { status, submenu };
+      }, { where: { id_submenu: id } });
+      const { status, submenu, message } = await this.getById({ id });
+      if (status) { return { status, submenu }; }
+      return { status, message };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async delete({ idSubmenu }) {
+  static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_submenu: idSubmenu } });
+      await this.destroy({ where: { id_submenu: id } });
       return { status: true, message: 'Submenu deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 }
-Submenu.init(
+SubmenuModel.init(
   {
     id_submenu: {
       type: Sequelize.INTEGER,
@@ -77,25 +87,3 @@ Submenu.init(
     modelName: 'Submenu'
   }
 );
-
-// // test post
-// Submenu.post({
-//   nameSubmenu: 'blobSubmenu',
-//   menuId: 1
-// }).then((result) => { console.log('Submenu:', result); });
-
-// test getAll
-// Submenu.getAll().then((result) => { console.log('Submenu:', result); });
-
-// test getById
-// Submenu.getById({ idSubmenu: 1 }).then((result) => { console.log('Submenu:', result); });
-
-// test put
-// Submenu.put({
-//   idSubmenu: 1,
-//   nameSubmenu: 'newBlobSubmenu',
-//   menuId: 1
-// }).then((result) => { console.log('Submenu:', result); });
-
-// test delete
-// Submenu.delete({ idSubmenu: 1 }).then((result) => { console.log('Submenu:', result); });

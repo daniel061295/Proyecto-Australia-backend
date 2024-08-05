@@ -2,7 +2,7 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database.js';
 
-export class State extends Model {
+export class StateModel extends Model {
   static async getAll() {
     try {
       const states = await this.findAll({ raw: true });
@@ -12,16 +12,21 @@ export class State extends Model {
     }
   }
 
-  static async getById({ idState }) {
+  static async getById({ id }) {
     try {
-      const state = await this.findByPk(idState, { raw: true });
-      return { status: true, state };
+      const state = await this.findByPk(id, { raw: true });
+      if (state !== null) return { status: true, state };
+      return { status: false, message: 'State not found!' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async post({ nameState, applyForService }) {
+  static async createNew({ input }) {
+    const {
+      nameState,
+      applyForService
+    } = input;
     try {
       const state = await this.create({
         name_state: nameState,
@@ -34,29 +39,34 @@ export class State extends Model {
     }
   }
 
-  static async put({ idState, nameState, applyForService }) {
+  static async updateByPk({ id, input }) {
+    const {
+      nameState,
+      applyForService
+    } = input;
     try {
       await this.update({
         name_state: nameState,
         apply_for_service: applyForService
-      }, { where: { id_state: idState } });
-      const { status, state } = await this.getById({ idState });
-      return { status, state };
+      }, { where: { id_state: id } });
+      const { status, state, message } = await this.getById({ id });
+      if (status) { return { status, state }; }
+      return { status, message };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async delete({ idState }) {
+  static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_state: idState } });
+      await this.destroy({ where: { id_state: id } });
       return { status: true, message: 'State deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 }
-State.init(
+StateModel.init(
 
   {
     id_state: {

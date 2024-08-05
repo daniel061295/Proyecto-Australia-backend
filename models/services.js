@@ -2,7 +2,7 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database.js';
 
-export class Service extends Model {
+export class ServiceModel extends Model {
   static async getAll() {
     try {
       const services = await this.findAll({ raw: true });
@@ -12,16 +12,25 @@ export class Service extends Model {
     }
   }
 
-  static async getById({ idService }) {
+  static async getById({ id }) {
     try {
-      const service = await this.findByPk(idService, { raw: true });
-      return { status: true, service };
+      const service = await this.findByPk(id, { raw: true });
+      if (service !== null) return { status: true, service };
+      return { status: false, message: 'service not found!' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async post({ imageUrlService, valueService, nameService, categoryId, stateId, descriptionService }) {
+  static async createNew({ input }) {
+    const {
+      imageUrlService,
+      valueService,
+      nameService,
+      categoryId,
+      stateId,
+      descriptionService
+    } = input;
     try {
       const service = await this.create({
         image_url_service: imageUrlService,
@@ -38,34 +47,43 @@ export class Service extends Model {
     }
   }
 
-  static async put({ idService, imageUrlService, valueService, nameService, categoryId, stateId, descriptionService }) {
+  static async updateByPk({ id, input }) {
+    const {
+      image_url_service: imageUrlService,
+      value_service: valueService,
+      name_service: nameService,
+      category_id: categoryId,
+      state_id: stateId,
+      description_service: descriptionService
+    } = input;
     try {
       await this.update({
-        id_service: idService,
+        id_service: id,
         image_url_service: imageUrlService,
         value_service: valueService,
         name_service: nameService,
         category_id: categoryId,
         state_id: stateId,
         description_service: descriptionService
-      }, { where: { id_service: idService } });
-      const { status, service } = await this.getById({ idService });
-      return { status, service };
+      }, { where: { id_service: id } });
+      const { status, service, message } = await this.getById({ id });
+      if (status) { return { status, service }; }
+      return { status, message };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async delete({ idService }) {
+  static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_service: idService } });
+      await this.destroy({ where: { id_service: id } });
       return { status: true, message: 'Service deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 }
-Service.init(
+ServiceModel.init(
 
   {
     id_service: {
@@ -103,33 +121,3 @@ Service.init(
     modelName: 'Service'
   }
 );
-
-// test post
-// Service.post({
-//   imageUrlService: 'blobUrlService',
-//   valueService: 1234556,
-//   nameService: 'blobNameService',
-//   categoryId: 15,
-//   stateId: 1,
-//   descriptionService: 'blobDescriptionService'
-// }).then((result) => { console.log('Service:', result); });
-
-// test getAll
-// Service.getAll().then((result) => { console.log('Service:', result); });
-
-// test getById
-// Service.getById({ idService: 1 }).then((result) => { console.log('Service:', result); });
-
-// test put
-// Service.put({
-//   idService: 2,
-//   imageUrlService: 'NewBlobUrlService',
-//   valueService: 1234556,
-//   nameService: 'NewBlobNameService',
-//   categoryId: 15,
-//   stateId: 1,
-//   descriptionService: 'blobDescriptionService'
-// }).then((result) => { console.log('Service:', result); });
-
-// test delete
-// Service.delete({ idService: 2 }).then((result) => { console.log('Service:', result); });

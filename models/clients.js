@@ -2,7 +2,7 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database.js';
 
-export class Client extends Model {
+export class ClientModel extends Model {
   static async getAll() {
     try {
       const clients = await this.findAll({ raw: true });
@@ -12,16 +12,22 @@ export class Client extends Model {
     }
   }
 
-  static async getById({ idClient }) {
+  static async getById({ id }) {
     try {
-      const client = await this.findByPk(idClient, { raw: true });
-      return { status: true, client };
+      const client = await this.findByPk(id, { raw: true });
+      if (client !== null) return { status: true, client };
+      return { status: false, message: 'Client not found!' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async post({ nameClient, emailClient, phoneNumberClient }) {
+  static async createNew({ input }) {
+    const {
+      nameClient,
+      emailClient,
+      phoneNumberClient
+    } = input;
     try {
       const client = await this.create({
         name_client: nameClient,
@@ -35,30 +41,36 @@ export class Client extends Model {
     }
   }
 
-  static async put({ idClient, nameClient, emailClient, phoneNumberClient }) {
+  static async updateByPk({ id, input }) {
+    const {
+      nameClient,
+      emailClient,
+      phoneNumberClient
+    } = input;
     try {
       await this.update({
         name_client: nameClient,
         email_client: emailClient,
         phone_number_client: phoneNumberClient
-      }, { where: { id_client: idClient } });
-      const { status, client } = await this.getById({ idClient });
-      return { status, client };
+      }, { where: { id_client: id } });
+      const { status, client, message } = await this.getById({ id });
+      if (status) { return { status, client }; }
+      return { status, message };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async delete({ idClient }) {
+  static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_client: idClient } });
+      await this.destroy({ where: { id_client: id } });
       return { status: true, message: 'Client deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 }
-Client.init(
+ClientModel.init(
 
   {
     id_client: {
@@ -84,27 +96,3 @@ Client.init(
     modelName: 'Client'
   }
 );
-
-// test post
-// Client.post({
-//   nameClient: 'blobClient',
-//   emailClient: 'blobClient@example.com',
-//   phoneNumberClient: 3421313132121
-// }).then((result) => { console.log('Client:', result); });
-
-// test getAll
-// Client.getAll().then((result) => { console.log('Client:', result); });
-
-// test getById
-// Client.getById({ idClient: 1 }).then((result) => { console.log('Client:', result); });
-
-// test put
-// Client.put({
-//   idClient: 1,
-//   nameClient: 'newBlobClient',
-//   emailClient: 'newBlobClient@example.com',
-//   phoneNumberClient: 3421366632121
-// }).then((result) => { console.log('Client:', result); });
-
-// test delete
-// Client.delete({ idClient: 2 }).then((result) => { console.log('Client:', result); });

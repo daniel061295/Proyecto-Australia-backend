@@ -2,7 +2,7 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../config/database.js';
 
-export class User extends Model {
+export class UserModel extends Model {
   static async getAll() {
     try {
       const users = await this.findAll({ raw: true });
@@ -12,16 +12,24 @@ export class User extends Model {
     }
   }
 
-  static async getById({ idUser }) {
+  static async getById({ id }) {
     try {
-      const user = await this.findByPk(idUser, { raw: true });
-      return { status: true, user };
+      const user = await this.findByPk(id, { raw: true });
+      if (user !== null) return { status: true, user };
+      return { status: false, message: 'User not found!' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async post({ nameUser, passwordUser, emailUser, tokenUser, profileId }) {
+  static async createNew({ input }) {
+    const {
+      nameUser,
+      passwordUser,
+      emailUser,
+      tokenUser,
+      profileId
+    } = input;
     try {
       const user = await this.create({
         name_user: nameUser,
@@ -37,7 +45,14 @@ export class User extends Model {
     }
   }
 
-  static async put({ idUser, nameUser, passwordUser, emailUser, tokenUser, profileId }) {
+  static async updateByPk({ id, input }) {
+    const {
+      nameUser,
+      passwordUser,
+      emailUser,
+      tokenUser,
+      profileId
+    } = input;
     try {
       await this.update({
         name_user: nameUser,
@@ -45,24 +60,25 @@ export class User extends Model {
         email_user: emailUser,
         token_user: tokenUser,
         profile_id: profileId
-      }, { where: { id_user: idUser } });
-      const { status, user } = await this.getById({ idUser });
-      return { status, user };
+      }, { where: { id_user: id } });
+      const { status, user, message } = await this.getById({ id });
+      if (status) { return { status, user }; }
+      return { status, message };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async delete({ idUser }) {
+  static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_user: idUser } });
+      await this.destroy({ where: { id_user: id } });
       return { status: true, message: 'User deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 }
-User.init(
+UserModel.init(
   {
     id_user: {
       type: Sequelize.INTEGER,
@@ -95,28 +111,3 @@ User.init(
     modelName: 'User'
   }
 );
-
-// // test post
-// User.post({
-//   nameUser: 'blobUser',
-//   passwordUser: 'blobUserPassword',
-//   emailUser: 'blobUserEmail',
-//   tokenUser: 'blobUserToken',
-//   profileId: 1
-// }).then((result) => { console.log('User:', result); });
-
-// test getAll
-// User.getAll().then((result) => { console.log('User:', result); });
-
-// test getById
-// User.getById({ idUser: 1 }).then((result) => { console.log('User:', result); });
-
-// test put
-// User.put({
-//   idUser: 1,
-//   nameUser: 'newBlobUser',
-//   menuId: 1
-// }).then((result) => { console.log('User:', result); });
-
-// test delete
-// User.delete({ idUser: 1 }).then((result) => { console.log('User:', result); });

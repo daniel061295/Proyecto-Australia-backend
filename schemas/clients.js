@@ -1,16 +1,25 @@
+/* eslint-disable space-before-function-paren */
 import { z } from 'zod';
 
 export const clientSchema = z.object({
-  name_client: z.string({
-    invalid_type_error: 'name_client must be a string',
-    required_error: 'name_client is required'
+  nameClient: z.string({
+    invalid_type_error: 'nameClient must be a string',
+    required_error: 'nameClient is required'
   }),
-  email_client: z.string({
-    invalid_type_error: 'email_client must be a string',
-    required_error: 'email_client is required'
-  }).email({ message: 'email_client must be a a valid email address' }),
-  phone_number_client: z.number({
-    invalid_type_error: 'phone_number_client must be a big integer',
-    required_error: 'phone_number_client is required'
+  emailClient: z.string({
+    invalid_type_error: 'emailClient must be a string',
+    required_error: 'emailClient is required'
+  }).email({ message: 'emailClient must be a a valid email address' }),
+  phoneNumberClient: z.number({
+    invalid_type_error: 'phoneNumberClient must be a big integer',
+    required_error: 'phoneNumberClient is required'
   }).int()
 });
+
+export function validateClient(input) {
+  return clientSchema.safeParse(input);
+}
+
+export function validatePartialClient(input) {
+  return clientSchema.partial().safeParse(input);
+}

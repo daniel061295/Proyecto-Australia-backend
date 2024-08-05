@@ -1,12 +1,21 @@
+/* eslint-disable space-before-function-paren */
 import { z } from 'zod';
 
 export const stateSchema = z.object({
-  name_state: z.string({
-    invalid_type_error: 'name_state must be a string',
-    required_error: 'name_state is required'
+  nameState: z.string({
+    invalid_type_error: 'nameState must be a string',
+    required_error: 'nameState is required'
   }),
-  apply_for_service: z.number({
-    invalid_type_error: 'apply_for_service must be a number',
-    required_error: 'apply_for_service is required'
+  applyForState: z.number({
+    invalid_type_error: 'applyForState must be a number',
+    required_error: 'applyForState is required'
   })
 });
+
+export function validateState(input) {
+  return stateSchema.safeParse(input);
+}
+
+export function validatePartialState(input) {
+  return stateSchema.partial().safeParse(input);
+}
