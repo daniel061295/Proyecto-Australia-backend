@@ -25,7 +25,7 @@ export class ProfileModel extends Model {
   static async createNew({ input }) {
     const { nameProfile } = input;
     try {
-      const profile = await this.create({ name_profile: nameProfile });
+      const profile = await this.create({ nameProfile });
       const plainProfile = profile.get({ plain: true });
       return { status: true, profile: plainProfile };
     } catch (error) {
@@ -36,7 +36,7 @@ export class ProfileModel extends Model {
   static async updateByPk({ id, input }) {
     const { nameProfile } = input;
     try {
-      await this.update({ name_profile: nameProfile }, { where: { id_profile: id } });
+      await this.update({ nameProfile }, { where: { idProfile: id } });
       const { status, profile, message } = await this.getById({ id });
       if (status) { return { status, profile }; }
       return { status, message };
@@ -47,7 +47,7 @@ export class ProfileModel extends Model {
 
   static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_profile: id } });
+      await this.destroy({ where: { idProfile: id } });
       return { status: true, message: 'Profile deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
@@ -57,18 +57,19 @@ export class ProfileModel extends Model {
 ProfileModel.init(
 
   {
-    id_profile: {
+    idProfile: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    name_profile: {
+    nameProfile: {
       type: DataTypes.STRING,
       allowNull: false
     }
   },
   {
     sequelize,
-    modelName: 'Profile'
+    tableName: 'Profiles',
+    underscored: true
   }
 );

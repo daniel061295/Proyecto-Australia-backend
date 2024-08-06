@@ -29,8 +29,8 @@ export class StateModel extends Model {
     } = input;
     try {
       const state = await this.create({
-        name_state: nameState,
-        apply_for_service: applyForService
+        nameState,
+        applyForService
       });
       const plainState = state.get({ plain: true });
       return { status: true, state: plainState };
@@ -46,9 +46,9 @@ export class StateModel extends Model {
     } = input;
     try {
       await this.update({
-        name_state: nameState,
-        apply_for_service: applyForService
-      }, { where: { id_state: id } });
+        nameState,
+        applyForService
+      }, { where: { idState: id } });
       const { status, state, message } = await this.getById({ id });
       if (status) { return { status, state }; }
       return { status, message };
@@ -59,7 +59,7 @@ export class StateModel extends Model {
 
   static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_state: id } });
+      await this.destroy({ where: { idState: id } });
       return { status: true, message: 'State deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
@@ -69,44 +69,23 @@ export class StateModel extends Model {
 StateModel.init(
 
   {
-    id_state: {
+    idState: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    name_state: {
+    nameState: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    apply_for_service: {
+    applyForService: {
       type: DataTypes.INTEGER,
       allowNull: false
     }
   },
   {
     sequelize,
-    modelName: 'State'
+    tableName: 'States',
+    underscored: true
   }
 );
-
-// test post
-// State.post({
-//   nameState: 'blobState',
-//   applyForService: 1
-// }).then((result) => { console.log('State:', result); });
-
-// test getAll
-// State.getAll().then((result) => { console.log('State:', result); });
-
-// test getById
-// State.getById({ idState: 1 }).then((result) => { console.log('State:', result); });
-
-// test put
-// State.put({
-//   idState: 1,
-//   nameState: 'newBlobState',
-//   apply_for_service: 1
-// }).then((result) => { console.log('State:', result); });
-
-// test delete
-// State.delete({ idState: 1 }).then((result) => { console.log('State:', result); });

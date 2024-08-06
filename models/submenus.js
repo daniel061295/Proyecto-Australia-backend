@@ -29,8 +29,8 @@ export class SubmenuModel extends Model {
     } = input;
     try {
       const submenu = await this.create({
-        name_submenu: nameSubmenu,
-        menu_id: menuId
+        nameSubmenu,
+        menuId
       });
       const plainSubmenu = submenu.get({ plain: true });
       return { status: true, submenu: plainSubmenu };
@@ -46,9 +46,9 @@ export class SubmenuModel extends Model {
     } = input;
     try {
       await this.update({
-        name_submenu: nameSubmenu,
-        menu_id: menuId
-      }, { where: { id_submenu: id } });
+        nameSubmenu,
+        menuId
+      }, { where: { idSubmenu: id } });
       const { status, submenu, message } = await this.getById({ id });
       if (status) { return { status, submenu }; }
       return { status, message };
@@ -59,7 +59,7 @@ export class SubmenuModel extends Model {
 
   static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_submenu: id } });
+      await this.destroy({ where: { idSubmenu: id } });
       return { status: true, message: 'Submenu deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
@@ -68,22 +68,23 @@ export class SubmenuModel extends Model {
 }
 SubmenuModel.init(
   {
-    id_submenu: {
+    idSubmenu: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    name_submenu: {
+    nameSubmenu: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    menu_id: {
+    menuId: {
       type: DataTypes.INTEGER,
       allowNull: false
     }
   },
   {
     sequelize,
-    modelName: 'Submenu'
+    tableName: 'Submenus',
+    underscored: true
   }
 );

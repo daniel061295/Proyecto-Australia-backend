@@ -25,7 +25,7 @@ export class MenuModel extends Model {
   static async createNew({ input }) {
     const { nameMenu } = input;
     try {
-      const menu = await this.create({ name_menu: nameMenu });
+      const menu = await this.create({ nameMenu });
       const plainMenu = menu.get({ plain: true });
       return { status: true, menu: plainMenu };
     } catch (error) {
@@ -36,7 +36,7 @@ export class MenuModel extends Model {
   static async updateByPk({ id, input }) {
     const { nameMenu } = input;
     try {
-      await this.update({ name_menu: nameMenu }, { where: { id_menu: id } });
+      await this.update({ nameMenu }, { where: { idMenu: id } });
       const { status, menu, message } = await this.getById({ id });
       if (status) { return { status, menu }; }
       return { status, message };
@@ -47,7 +47,7 @@ export class MenuModel extends Model {
 
   static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_menu: id } });
+      await this.destroy({ where: { idMenu: id } });
       return { status: true, message: 'Menu deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
@@ -57,18 +57,19 @@ export class MenuModel extends Model {
 MenuModel.init(
 
   {
-    id_menu: {
+    idMenu: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    name_menu: {
+    nameMenu: {
       type: DataTypes.STRING,
       allowNull: false
     }
   },
   {
     sequelize,
-    modelName: 'Menu'
+    tableName: 'Menus',
+    underscored: true
   }
 );

@@ -32,11 +32,11 @@ export class UserModel extends Model {
     } = input;
     try {
       const user = await this.create({
-        name_user: nameUser,
-        password_user: passwordUser,
-        email_user: emailUser,
-        token_user: tokenUser,
-        profile_id: profileId
+        nameUser,
+        passwordUser,
+        emailUser,
+        tokenUser,
+        profileId
       });
       const plainUser = user.get({ plain: true });
       return { status: true, user: plainUser };
@@ -55,12 +55,12 @@ export class UserModel extends Model {
     } = input;
     try {
       await this.update({
-        name_user: nameUser,
-        password_user: passwordUser,
-        email_user: emailUser,
-        token_user: tokenUser,
-        profile_id: profileId
-      }, { where: { id_user: id } });
+        nameUser,
+        passwordUser,
+        emailUser,
+        tokenUser,
+        profileId
+      }, { where: { idUser: id } });
       const { status, user, message } = await this.getById({ id });
       if (status) { return { status, user }; }
       return { status, message };
@@ -71,7 +71,7 @@ export class UserModel extends Model {
 
   static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_user: id } });
+      await this.destroy({ where: { idUser: id } });
       return { status: true, message: 'User deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
@@ -80,34 +80,35 @@ export class UserModel extends Model {
 }
 UserModel.init(
   {
-    id_user: {
+    idUser: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    name_user: {
+    nameUser: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    password_user: {
+    passwordUser: {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    email_user: {
+    emailUser: {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    token_user: {
+    tokenUser: {
       type: DataTypes.TEXT,
       allowNull: false
     },
-    profile_id: {
+    profileId: {
       type: DataTypes.INTEGER,
       allowNull: false
     }
   },
   {
     sequelize,
-    modelName: 'User'
+    tableName: 'Users',
+    underscored: true
   }
 );

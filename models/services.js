@@ -33,12 +33,12 @@ export class ServiceModel extends Model {
     } = input;
     try {
       const service = await this.create({
-        image_url_service: imageUrlService,
-        value_service: valueService,
-        name_service: nameService,
-        category_id: categoryId,
-        state_id: stateId,
-        description_service: descriptionService
+        imageUrlService,
+        valueService,
+        nameService,
+        categoryId,
+        stateId,
+        descriptionService
       });
       const plainService = service.get({ plain: true });
       return { status: true, service: plainService };
@@ -49,23 +49,22 @@ export class ServiceModel extends Model {
 
   static async updateByPk({ id, input }) {
     const {
-      image_url_service: imageUrlService,
-      value_service: valueService,
-      name_service: nameService,
-      category_id: categoryId,
-      state_id: stateId,
-      description_service: descriptionService
+      imageUrlService,
+      valueService,
+      nameService,
+      categoryId,
+      stateId,
+      descriptionService
     } = input;
     try {
       await this.update({
-        id_service: id,
-        image_url_service: imageUrlService,
-        value_service: valueService,
-        name_service: nameService,
-        category_id: categoryId,
-        state_id: stateId,
-        description_service: descriptionService
-      }, { where: { id_service: id } });
+        imageUrlService,
+        valueService,
+        nameService,
+        categoryId,
+        stateId,
+        descriptionService
+      }, { where: { idService: id } });
       const { status, service, message } = await this.getById({ id });
       if (status) { return { status, service }; }
       return { status, message };
@@ -76,7 +75,7 @@ export class ServiceModel extends Model {
 
   static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_service: id } });
+      await this.destroy({ where: { idService: id } });
       return { status: true, message: 'Service deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
@@ -86,38 +85,39 @@ export class ServiceModel extends Model {
 ServiceModel.init(
 
   {
-    id_service: {
+    idService: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    image_url_service: {
+    imageUrlService: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    value_service: {
+    valueService: {
       type: DataTypes.NUMBER,
       allowNull: false
     },
-    name_service: {
+    nameService: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    category_id: {
+    categoryId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    state_id: {
+    stateId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    description_service: {
+    descriptionService: {
       type: DataTypes.TEXT,
       allowNull: false
     }
   },
   {
     sequelize,
-    modelName: 'Service'
+    tableName: 'Services',
+    underscored: true
   }
 );

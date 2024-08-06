@@ -8,7 +8,7 @@ export class CategoryModel extends Model {
       const categories = await this.findAll({ raw: true });
       return { status: true, categories };
     } catch (error) {
-      return { status: false, message: error };
+      return { status: false, categories: error };
     }
   }
 
@@ -23,9 +23,9 @@ export class CategoryModel extends Model {
   }
 
   static async createNew({ input }) {
-    const { nameCategory } = input;
+    const { nameCategory, imageUrlCategory } = input;
     try {
-      const category = await this.create({ name_category: nameCategory });
+      const category = await this.create({ nameCategory, imageUrlCategory });
       const plainCategory = category.get({ plain: true });
       return { status: true, category: plainCategory };
     } catch (error) {
@@ -34,9 +34,9 @@ export class CategoryModel extends Model {
   }
 
   static async updateByPk({ id, input }) {
-    const { nameCategory } = input;
+    const { nameCategory, imageUrlCategory } = input;
     try {
-      await this.update({ name_category: nameCategory }, { where: { id_category: id } });
+      await this.update({ nameCategory, imageUrlCategory }, { where: { idCategory: id } });
       const { status, category, message } = await this.getById({ id });
       if (status) { return { status, category }; }
       return { status, message };
@@ -47,7 +47,7 @@ export class CategoryModel extends Model {
 
   static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_category: id } });
+      await this.destroy({ where: { idCategory: id } });
       return { status: true, message: 'Category deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
@@ -57,38 +57,24 @@ export class CategoryModel extends Model {
 CategoryModel.init(
 
   {
-    id_category: {
+    idCategory: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
+
     },
-    name_category: {
+    nameCategory: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    imageUrlCategory: {
       type: DataTypes.STRING,
       allowNull: false
     }
   },
   {
     sequelize,
-    modelName: 'Category'
+    tableName: 'Categories',
+    underscored: true
   }
 );
-
-// // test create
-// Category.create({
-//   nameCategory: 'blobCategory'
-// }).then((result) => { console.log('Category:', result); });
-
-// test getAll
-// Category.getAll().then((result) => { console.log('Category:', result); });
-
-// test getById
-// Category.getById({ idClient: 1 }).then((result) => { console.log('Category:', result); });
-
-// test update
-// Category.update({
-//   idCategory: 1,
-//   nameCategory: 'newBlobCategory'
-// }).then((result) => { console.log('Category:', result); });
-
-// test delete
-// Category.delete({ idCategory: 1 }).then((result) => { console.log('Category:', result); });

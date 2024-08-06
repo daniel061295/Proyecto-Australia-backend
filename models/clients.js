@@ -8,7 +8,7 @@ export class ClientModel extends Model {
       const clients = await this.findAll({ raw: true });
       return { status: true, clients };
     } catch (error) {
-      return { status: false, message: error };
+      return { status: false, clients: error };
     }
   }
 
@@ -49,9 +49,9 @@ export class ClientModel extends Model {
     } = input;
     try {
       await this.update({
-        name_client: nameClient,
-        email_client: emailClient,
-        phone_number_client: phoneNumberClient
+        nameClient,
+        emailClient,
+        phoneNumberClient
       }, { where: { id_client: id } });
       const { status, client, message } = await this.getById({ id });
       if (status) { return { status, client }; }
@@ -63,7 +63,7 @@ export class ClientModel extends Model {
 
   static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_client: id } });
+      await this.destroy({ where: { idClient: id } });
       return { status: true, message: 'Client deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
@@ -73,26 +73,27 @@ export class ClientModel extends Model {
 ClientModel.init(
 
   {
-    id_client: {
+    idClient: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    name_client: {
+    nameClient: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    email_client: {
+    emailClient: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    phone_number_client: {
+    phoneNumberClient: {
       type: DataTypes.BIGINT,
       allowNull: false
     }
   },
   {
     sequelize,
-    modelName: 'Client'
+    tableName: 'Clients',
+    underscored: true
   }
 );

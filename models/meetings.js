@@ -31,10 +31,10 @@ export class MeetingModel extends Model {
     } = input;
     try {
       const meeting = await this.create({
-        date_time_meeting: dateTimeMeeting,
-        state_id: stateId,
-        client_id: clientId,
-        service_id: serviceId
+        dateTimeMeeting,
+        stateId,
+        clientId,
+        serviceId
       });
       const plainMeeting = meeting.get({ plain: true });
       return { status: true, meeting: plainMeeting };
@@ -52,12 +52,11 @@ export class MeetingModel extends Model {
     } = input;
     try {
       await this.update({
-        id_meeting: id,
-        date_time_meeting: dateTimeMeeting,
-        state_id: stateId,
-        client_id: clientId,
-        service_id: serviceId
-      }, { where: { id_meeting: id } });
+        dateTimeMeeting,
+        stateId,
+        clientId,
+        serviceId
+      }, { where: { idMeeting: id } });
       const { status, meeting, message } = await this.getById({ id });
       if (status) { return { status, meeting }; }
       return { status, message };
@@ -68,7 +67,7 @@ export class MeetingModel extends Model {
 
   static async delete({ id }) {
     try {
-      await this.destroy({ where: { id_meeting: id } });
+      await this.destroy({ where: { idMeeting: id } });
       return { status: true, message: 'Meeting deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
@@ -78,30 +77,31 @@ export class MeetingModel extends Model {
 MeetingModel.init(
 
   {
-    id_meeting: {
+    idMeeting: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    date_time_meeting: {
+    dateTimeMeeting: {
       type: DataTypes.DATE,
       allowNull: false
     },
-    state_id: {
+    stateId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    client_id: {
+    clientId: {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    service_id: {
+    serviceId: {
       type: DataTypes.INTEGER,
       allowNull: false
     }
   },
   {
     sequelize,
-    modelName: 'Meeting'
+    tableName: 'Meetings',
+    underscored: true
   }
 );
