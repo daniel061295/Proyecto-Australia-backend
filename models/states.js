@@ -6,7 +6,7 @@ export class StateModel extends Model {
   static async getAll() {
     try {
       const states = await this.findAll({ raw: true });
-      return { status: true, states };
+      return { status: true, result: states };
     } catch (error) {
       return { status: false, message: error };
     }
@@ -15,7 +15,7 @@ export class StateModel extends Model {
   static async getById({ id }) {
     try {
       const state = await this.findByPk(id, { raw: true });
-      if (state !== null) return { status: true, state };
+      if (state !== null) return { status: true, result: state };
       return { status: false, message: 'State not found!' };
     } catch (error) {
       return { status: false, message: error };
@@ -33,7 +33,7 @@ export class StateModel extends Model {
         applyForService
       });
       const plainState = state.get({ plain: true });
-      return { status: true, state: plainState };
+      return { status: true, result: plainState };
     } catch (error) {
       return { status: false, message: error };
     }
@@ -49,8 +49,8 @@ export class StateModel extends Model {
         nameState,
         applyForService
       }, { where: { idState: id } });
-      const { status, state, message } = await this.getById({ id });
-      if (status) { return { status, state }; }
+      const { status, result, message } = await this.getById({ id });
+      if (status) { return { status, result }; }
       return { status, message };
     } catch (error) {
       return { status: false, message: error };

@@ -6,7 +6,7 @@ export class ServiceModel extends Model {
   static async getAll() {
     try {
       const services = await this.findAll({ raw: true });
-      return { status: true, services };
+      return { status: true, result: services };
     } catch (error) {
       return { status: false, message: error };
     }
@@ -15,7 +15,7 @@ export class ServiceModel extends Model {
   static async getById({ id }) {
     try {
       const service = await this.findByPk(id, { raw: true });
-      if (service !== null) return { status: true, service };
+      if (service !== null) return { status: true, result: service };
       return { status: false, message: 'service not found!' };
     } catch (error) {
       return { status: false, message: error };
@@ -41,7 +41,7 @@ export class ServiceModel extends Model {
         descriptionService
       });
       const plainService = service.get({ plain: true });
-      return { status: true, service: plainService };
+      return { status: true, result: plainService };
     } catch (error) {
       return { status: false, message: error };
     }
@@ -65,8 +65,8 @@ export class ServiceModel extends Model {
         stateId,
         descriptionService
       }, { where: { idService: id } });
-      const { status, service, message } = await this.getById({ id });
-      if (status) { return { status, service }; }
+      const { status, result, message } = await this.getById({ id });
+      if (status) { return { status, result }; }
       return { status, message };
     } catch (error) {
       return { status: false, message: error };

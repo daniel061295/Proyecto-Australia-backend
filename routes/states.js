@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import { StateController } from '../controllers/states.js';
+import { StateSchema } from '../schemas/states.js';
 
 export const createStateRouter = ({ stateModel }) => {
   const stateRouter = Router();
 
-  const stateController = new StateController({ stateModel });
+  const stateSchema = new StateSchema();
+  const stateController = new StateController({ baseModel: stateModel, baseSchema: stateSchema });
 
   stateRouter.get('/', stateController.getAll);
   stateRouter.post('/', stateController.create);

@@ -6,7 +6,7 @@ export class MeetingModel extends Model {
   static async getAll() {
     try {
       const meetings = await this.findAll({ raw: true });
-      return { status: true, meetings };
+      return { status: true, result: meetings };
     } catch (error) {
       return { status: false, message: error };
     }
@@ -15,7 +15,7 @@ export class MeetingModel extends Model {
   static async getById({ id }) {
     try {
       const meeting = await this.findByPk(id, { raw: true });
-      if (meeting !== null) return { status: true, meeting };
+      if (meeting !== null) return { status: true, result: meeting };
       return { status: false, message: 'Meeting not found!' };
     } catch (error) {
       return { status: false, message: error };
@@ -37,7 +37,7 @@ export class MeetingModel extends Model {
         serviceId
       });
       const plainMeeting = meeting.get({ plain: true });
-      return { status: true, meeting: plainMeeting };
+      return { status: true, result: plainMeeting };
     } catch (error) {
       return { status: false, message: error };
     }
@@ -57,8 +57,8 @@ export class MeetingModel extends Model {
         clientId,
         serviceId
       }, { where: { idMeeting: id } });
-      const { status, meeting, message } = await this.getById({ id });
-      if (status) { return { status, meeting }; }
+      const { status, result, message } = await this.getById({ id });
+      if (status) { return { status, result }; }
       return { status, message };
     } catch (error) {
       return { status: false, message: error };

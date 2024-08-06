@@ -6,16 +6,16 @@ export class ClientModel extends Model {
   static async getAll() {
     try {
       const clients = await this.findAll({ raw: true });
-      return { status: true, clients };
+      return { status: true, result: clients };
     } catch (error) {
-      return { status: false, clients: error };
+      return { status: false, result: error };
     }
   }
 
   static async getById({ id }) {
     try {
       const client = await this.findByPk(id, { raw: true });
-      if (client !== null) return { status: true, client };
+      if (client !== null) return { status: true, result: client };
       return { status: false, message: 'Client not found!' };
     } catch (error) {
       return { status: false, message: error };
@@ -30,14 +30,14 @@ export class ClientModel extends Model {
     } = input;
     try {
       const client = await this.create({
-        name_client: nameClient,
-        email_client: emailClient,
-        phone_number_client: phoneNumberClient
+        nameClient,
+        emailClient,
+        phoneNumberClient
       });
       const plainClient = client.get({ plain: true });
-      return { status: true, client: plainClient };
+      return { status: true, result: plainClient };
     } catch (error) {
-      return { status: false, message: error };
+      return { status: false, result: error };
     }
   }
 
@@ -53,8 +53,9 @@ export class ClientModel extends Model {
         emailClient,
         phoneNumberClient
       }, { where: { id_client: id } });
-      const { status, client, message } = await this.getById({ id });
-      if (status) { return { status, client }; }
+      const { status, result, message } = await this.getById({ id });
+      console.log(status);
+      if (status) { return { status, result }; }
       return { status, message };
     } catch (error) {
       return { status: false, message: error };

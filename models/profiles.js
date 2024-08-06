@@ -6,7 +6,7 @@ export class ProfileModel extends Model {
   static async getAll() {
     try {
       const profiles = await this.findAll({ raw: true });
-      return { status: true, profiles };
+      return { status: true, result: profiles };
     } catch (error) {
       return { status: false, message: error };
     }
@@ -15,7 +15,7 @@ export class ProfileModel extends Model {
   static async getById({ id }) {
     try {
       const profile = await this.findByPk(id, { raw: true });
-      if (profile !== null) return { status: true, profile };
+      if (profile !== null) return { status: true, result: profile };
       return { status: false, message: 'Profile not found!' };
     } catch (error) {
       return { status: false, message: error };
@@ -27,7 +27,7 @@ export class ProfileModel extends Model {
     try {
       const profile = await this.create({ nameProfile });
       const plainProfile = profile.get({ plain: true });
-      return { status: true, profile: plainProfile };
+      return { status: true, result: plainProfile };
     } catch (error) {
       return { status: false, message: error };
     }
@@ -37,8 +37,8 @@ export class ProfileModel extends Model {
     const { nameProfile } = input;
     try {
       await this.update({ nameProfile }, { where: { idProfile: id } });
-      const { status, profile, message } = await this.getById({ id });
-      if (status) { return { status, profile }; }
+      const { status, result, message } = await this.getById({ id });
+      if (status) { return { status, result }; }
       return { status, message };
     } catch (error) {
       return { status: false, message: error };
