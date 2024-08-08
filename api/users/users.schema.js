@@ -35,3 +35,26 @@ export class UserSchema {
     return this.userSchema.partial().safeParse(input);
   }
 }
+
+export class LoginUserSchema {
+  constructor() {
+    this.loginUserSchema = z.object({
+      nameUser: z.string({
+        invalid_type_error: 'nameUser must be a string',
+        required_error: 'nameUser is required'
+      }),
+      passwordUser: z.string({
+        invalid_type_error: 'passwordUser must be a string',
+        required_error: 'passwordUser is required'
+      })
+    });
+  }
+
+  validate(input) {
+    return this.loginUserSchema.safeParse(input);
+  }
+
+  validatePartial(input) {
+    return this.loginUserSchema.partial().safeParse(input);
+  }
+}

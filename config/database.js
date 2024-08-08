@@ -1,7 +1,7 @@
 import { Sequelize } from 'sequelize';
 import { readJSON } from '../utils.js';
 
-const dbInfo = readJSON('./config/settings.json');
+const dbInfo = readJSON('./settings.json');
 
 const { database, username, password, hostname, port, dialect } = dbInfo;
 

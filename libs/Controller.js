@@ -1,5 +1,4 @@
 /* eslint-disable space-before-function-paren */
-
 export class Controller {
   constructor({ Model, Schema }) {
     this.Model = Model;

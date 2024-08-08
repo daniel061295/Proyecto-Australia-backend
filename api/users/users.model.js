@@ -77,6 +77,16 @@ export class UserModel extends Model {
       return { status: false, message: error };
     }
   }
+
+  static async getByNameUser({ nameUser }) {
+    try {
+      const user = await this.findOne({ where: { nameUser }, raw: true });
+      if (user !== null) { return { status: true, result: user }; }
+      return { status: false, result: 'User not found' };
+    } catch (error) {
+      return { status: false, result: error };
+    }
+  }
 }
 UserModel.init(
   {
