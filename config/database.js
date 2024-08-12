@@ -1,14 +1,10 @@
 import { Sequelize } from 'sequelize';
-import { readJSON } from '../utils.js';
+import { DATABASE_NAME, USERNAME_DB, PASSWORD_DB, HOSTNAME_DB, PORT_DB, DIALECT_DB } from '../config.js';
 
-const dbInfo = readJSON('./settings.json');
-
-const { database, username, password, hostname, port, dialect } = dbInfo;
-
-export const sequelize = new Sequelize(database, username, password, {
-  host: hostname,
-  dialect,
-  port,
+export const sequelize = new Sequelize(DATABASE_NAME, USERNAME_DB, PASSWORD_DB, {
+  host: HOSTNAME_DB,
+  dialect: DIALECT_DB,
+  port: PORT_DB,
   logging: false,
   define: {
     timestamps: false

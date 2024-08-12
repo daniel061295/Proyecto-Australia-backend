@@ -1,8 +1,0 @@
-{
-    "database": "australia_wm",
-    "username": "root",
-    "password": "wmsas2012",
-    "hostname": "192.168.0.55",
-    "port": "3306",
-    "dialect": "mariadb"
-}

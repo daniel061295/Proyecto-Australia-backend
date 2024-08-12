@@ -1,6 +1,8 @@
 /* eslint-disable space-before-function-paren */
 import { Controller } from '../../libs/Controller.js';
 import { LoginUserSchema } from './users.schema.js';
+import { SECRET_JWT_KEY } from '../../config.js';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
 export class UserController extends Controller {
@@ -9,20 +11,11 @@ export class UserController extends Controller {
     if (!validationResult.success) {
       return res.status(422).json({ error: JSON.parse(validationResult.error.message) });
     }
-    const {
-      nameUser,
-      passwordUser,
-      emailUser,
-      tokenUser,
-      profileId
-    } = validationResult.data;
+
     const { status, result } = await this.Model.createNew({
       input: {
-        nameUser,
-        passwordUser: await bcrypt.hash(passwordUser, 10),
-        emailUser,
-        tokenUser,
-        profileId
+        ...validationResult.data,
+        passwordUser: await bcrypt.hash(validationResult.data.passwordUser, 10)
       }
     });
     if (status) return res.status(201).json({ message: 'User successfully created' });
@@ -31,18 +24,35 @@ export class UserController extends Controller {
 
   login = async (req, res) => {
     const loginUserSchema = new LoginUserSchema();
+
     const validationResult = loginUserSchema.validate(req.body);
     if (!validationResult.success) {
-      return res.status(422).json({ error: JSON.parse(validationResult.error.message) });
+      return res.status(422).json({
+        error: JSON.parse(validationResult.error.message)
+      });
     }
     const { nameUser, passwordUser } = validationResult.data;
-    const user = await this.Model.getByNameUser({ nameUser });
 
-    if (!user) { return res.status(404).json({ message: `User ${nameUser} does not exist!` }); }
+    const user = await this.Model.getByNameUser({ nameUser });
+    if (!user.status) { return res.status(404).json({ message: `User ${nameUser} does not exist!` }); }
 
     const isValid = await bcrypt.compare(passwordUser, user.result.passwordUser);
     if (!isValid) { return res.status(401).json({ message: 'Invalid password' }); }
-    return res.json({ message: 'Login Successful' });
+    const token = jwt.sign(
+      {
+        idUser: user.result.idUser,
+        nameUser: user.result.nameUser,
+        passwordUser: user.result.passwordUser
+      }, SECRET_JWT_KEY, { expiresIn: 3600 * 1 }); // 3600 * 1 expires in 1 hour
+    return res
+      .cookie('access_token', token)
+      .json({ message: 'Login Successful' });
+  };
+
+  logout = async (req, res) => {
+    res
+      .clearCookie('access_token')
+      .json({ message: 'Logout Successful' });
   };
 
   getById = async (req, res) => {
@@ -57,13 +67,5 @@ export class UserController extends Controller {
       return res.json({ nameUser, emailUser, profileId });
     }
     res.status(404).json({ message: `Object with id: ${id} not found` });
-  };
-
-  update = async (req, res) => {
-    res.status(403).json({ message: 'Put request on this resource is forbidden' });
-  };
-
-  getAll = async (req, res) => {
-    res.status(403).json({ message: 'Get request on this resource is forbidden' });
   };
 }

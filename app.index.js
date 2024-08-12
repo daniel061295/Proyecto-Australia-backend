@@ -1,5 +1,6 @@
 import express, { json } from 'express';
 import { corsMiddleware } from './middlewares/cors.js';
+import cookieParser from 'cookie-parser';
 
 import { createCategoryRouter } from './api/categories/categories.router.js';
 import { createClientRouter } from './api/clients/clients.router.js';
@@ -19,12 +20,18 @@ import { ProfileModel } from './api/profiles/profiles.model.js';
 import { ServiceModel } from './api/services/services.model.js';
 import { StateModel } from './api/states/states.model.js';
 import { SubmenuModel } from './api/submenus/submenus.model.js';
+
 import { UserModel } from './api/users/users.model.js';
+
+import { verityToken } from './middlewares/auth.js';
 
 const app = express();
 app.disable('x-powered-by');
 app.use(corsMiddleware());
 app.use(json());
+app.use(cookieParser());
+
+app.use(verityToken);
 
 app.use('/categories', createCategoryRouter({ categoryModel: CategoryModel }));
 app.use('/clients', createClientRouter({ clientModel: ClientModel }));
