@@ -3,7 +3,7 @@ export const {
   USERNAME_DB = 'root',
   PASSWORD_DB = 'wmsas2012',
   HOSTNAME_DB = '192.168.0.55',
-  PORT_DB = '3306',
+  PORT_DB = 3306,
   DIALECT_DB = 'mariadb',
   SECRET_JWT_KEY = 'secret'
 } = process.env;

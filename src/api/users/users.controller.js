@@ -22,6 +22,20 @@ export class UserController extends Controller {
     res.status(500).json({ message: `Error on create method: ${result}` });
   };
 
+  getById = async (req, res) => {
+    const { id } = req.params;
+    const { status, result } = await this.Model.getById({ id });
+    if (status) {
+      const {
+        nameUser,
+        emailUser,
+        profileId
+      } = result;
+      return res.json({ nameUser, emailUser, profileId });
+    }
+    res.status(404).json({ message: `Object with id: ${id} not found` });
+  };
+
   login = async (req, res) => {
     const loginUserSchema = new LoginUserSchema();
 
@@ -53,19 +67,5 @@ export class UserController extends Controller {
     res
       .clearCookie('access_token')
       .json({ message: 'Logout Successful' });
-  };
-
-  getById = async (req, res) => {
-    const { id } = req.params;
-    const { status, result } = await this.Model.getById({ id });
-    if (status) {
-      const {
-        nameUser,
-        emailUser,
-        profileId
-      } = result;
-      return res.json({ nameUser, emailUser, profileId });
-    }
-    res.status(404).json({ message: `Object with id: ${id} not found` });
   };
 }
