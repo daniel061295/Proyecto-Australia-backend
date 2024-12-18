@@ -1,9 +1,7 @@
-/* eslint-disable space-before-function-paren */
 import { Controller } from '../../libs/Controller.js';
 import { deleteFile } from '../../libs/utils/deleteFile.js';
 
-
-export class CategoryController extends Controller {
+export class ImagesServiceController extends Controller {
   create = async (req, res) => {
     const validationResult = this.Schema.validate(req.body);
     if (!validationResult.success) {
@@ -13,7 +11,7 @@ export class CategoryController extends Controller {
       return res.status(422).json({ error: 'No file uploaded' })
     }
     const payload = {
-      imageUrlCategory: req.file.path,
+      imageUrl: req.file.path,
       ...validationResult.data
     }
     const { status, result } = await this.Model.createNew({ input: payload });
@@ -30,8 +28,8 @@ export class CategoryController extends Controller {
         return res.status(404).json({ message: `Object with id: ${id} not found` });
       }
 
-      const { imageUrlCategory } = byId.result;
-      const fileResult = await deleteFile(imageUrlCategory);
+      const { imageUrl } = byId.result;
+      const fileResult = await deleteFile(imageUrl);
 
       if (!fileResult.success) {
         const errorMessage = fileResult.errorCode === 'ENOENT'
@@ -69,9 +67,9 @@ export class CategoryController extends Controller {
           return res.status(404).json({ message: `Object with id: ${id} not found` });
         }
 
-        const { imageUrlCategory } = byId.result;
-        if (imageUrlCategory && imageUrlCategory !== req.file.path) {
-          const fileResult = await deleteFile(imageUrlCategory);
+        const { imageUrl } = byId.result;
+        if (imageUrl && imageUrl !== req.file.path) {
+          const fileResult = await deleteFile(imageUrl);
           if (!fileResult.success) {
             const errorMessage = fileResult.errorCode === 'ENOENT'
               ? 'File not found!'
@@ -80,7 +78,7 @@ export class CategoryController extends Controller {
           }
         }
 
-        payload = { ...payload, imageUrlCategory: req.file.path };
+        payload = { ...payload, imageUrl: req.file.path };
       }
 
       const { status, result, message } = await this.Model.updateByPk({ id, input: payload });
@@ -95,6 +93,4 @@ export class CategoryController extends Controller {
       return res.status(500).json({ error: 'Internal server error.' });
     }
   };
-
-
 }

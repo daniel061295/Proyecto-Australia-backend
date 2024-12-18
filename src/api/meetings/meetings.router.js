@@ -8,6 +8,8 @@ export const createMeetingRouter = ({ meetingModel }) => {
   const meetingSchema = new MeetingSchema();
   const meetingController = new MeetingController({ Model: meetingModel, Schema: meetingSchema });
 
+
+  meetingRouter.post('/withclient', meetingController.createMeetingWithClient);
   meetingRouter.get('/', meetingController.getAll);
   meetingRouter.post('/', meetingController.create);
 

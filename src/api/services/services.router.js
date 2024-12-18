@@ -8,12 +8,15 @@ export const createServiceRouter = ({ serviceModel }) => {
   const serviceSchema = new ServiceSchema();
   const serviceController = new ServiceController({ Model: serviceModel, Schema: serviceSchema });
 
+  serviceRouter.get('/filter', serviceController.getByCategory);
+
   serviceRouter.get('/', serviceController.getAll);
   serviceRouter.post('/', serviceController.create);
 
   serviceRouter.get('/:id', serviceController.getById);
   serviceRouter.delete('/:id', serviceController.delete);
   serviceRouter.put('/:id', serviceController.update);
+
 
   return serviceRouter;
 };

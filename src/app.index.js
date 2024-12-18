@@ -1,7 +1,7 @@
 import express, { json } from 'express';
+import { initializeDatabase } from './config/database.js';
 import cookieParser from 'cookie-parser';
-import { corsMiddleware } from './middlewares/cors.js';
-import { verityToken } from './middlewares/auth.js';
+import { corsMiddleware, verityToken, jsonErrorHandler } from './middlewares/index.js';
 
 import { createCategoryRouter, CategoryModel } from './api/categories/categories.index.js';
 import { createClientRouter, ClientModel } from './api/clients/clients.index.js';
@@ -12,14 +12,17 @@ import { createServiceRouter, ServiceModel } from './api/services/services.index
 import { createStateRouter, StateModel } from './api/states/states.index.js';
 import { createSubmenuRouter, SubmenuModel } from './api/submenus/submenus.index.js';
 import { createUserRouter, UserModel } from './api/users/users.index.js';
+import { createImagesServiceRouter, ImagesServiceModel } from './api/imagesServices/imagesServices.index.js';
 
 const app = express();
+await initializeDatabase();
 app.disable('x-powered-by');
 app.use(corsMiddleware());
 app.use(json());
 app.use(cookieParser());
 
 app.use(verityToken);
+app.use(jsonErrorHandler);
 
 app.use('/categories', createCategoryRouter({ categoryModel: CategoryModel }));
 app.use('/clients', createClientRouter({ clientModel: ClientModel }));
@@ -30,6 +33,7 @@ app.use('/services', createServiceRouter({ serviceModel: ServiceModel }));
 app.use('/states', createStateRouter({ stateModel: StateModel }));
 app.use('/submenus', createSubmenuRouter({ submenuModel: SubmenuModel }));
 app.use('/users', createUserRouter({ userModel: UserModel }));
+app.use('/imagesservices', createImagesServiceRouter({ imagesServiceModel: ImagesServiceModel }));
 
 const PORT = process.env.PORT ?? 8080;
 app.listen(PORT, () => {

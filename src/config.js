@@ -5,5 +5,6 @@ export const {
   HOSTNAME_DB = '192.168.0.55',
   PORT_DB = 3306,
   DIALECT_DB = 'mariadb',
-  SECRET_JWT_KEY = 'secret'
+  SECRET_JWT_KEY = 'secret',
+  PORT = 8080
 } = process.env;

@@ -7,11 +7,7 @@ export class CategorySchema {
       nameCategory: z.string({
         invalid_type_error: 'nameCategory must be a string',
         required_error: 'nameCategory is required'
-      }),
-      imageUrlCategory: z.string({
-        invalid_type_error: 'imageUrlCategory must be a string',
-        required_error: 'imageUrlCategory is required'
-      }).url({ message: 'imageUrlCategory must be a a valid url address' })
+      })
     });
   }
 

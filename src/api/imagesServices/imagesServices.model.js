@@ -1,9 +1,9 @@
 /* eslint-disable space-before-function-paren */
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../../config/database.js';
-import { CategoryModel } from '../categories/categories.model.js';
+import { ServiceModel } from '../services/services.model.js';
 
-export class ServiceModel extends Model {
+export class ImagesServiceModel extends Model {
   static async getAll() {
     try {
       const services = await this.findAll({ raw: true });
@@ -17,7 +17,7 @@ export class ServiceModel extends Model {
     try {
       const service = await this.findByPk(id, { raw: true });
       if (service !== null) return { status: true, result: service };
-      return { status: false, message: 'service not found!' };
+      return { status: false, message: 'image not found!' };
     } catch (error) {
       return { status: false, message: error };
     }
@@ -25,47 +25,31 @@ export class ServiceModel extends Model {
 
   static async createNew({ input }) {
     const {
-      imageUrlService,
-      valueService,
-      nameService,
-      categoryId,
-      stateId,
-      descriptionService
+      imageUrl,
+      serviceId
     } = input;
     try {
       const service = await this.create({
-        imageUrlService,
-        valueService,
-        nameService,
-        categoryId,
-        stateId,
-        descriptionService
+        imageUrl,
+        serviceId
       });
       const plainService = service.get({ plain: true });
       return { status: true, result: plainService };
     } catch (error) {
-      return { status: false, message: error };
+      return { status: false, result: error };
     }
   }
 
   static async updateByPk({ id, input }) {
     const {
-      imageUrlService,
-      valueService,
-      nameService,
-      categoryId,
-      stateId,
-      descriptionService
+      imageUrl,
+      serviceId
     } = input;
     try {
       await this.update({
-        imageUrlService,
-        valueService,
-        nameService,
-        categoryId,
-        stateId,
-        descriptionService
-      }, { where: { idService: id } });
+        imageUrl,
+        serviceId
+      }, { where: { idImagesService: id } });
       const { status, result, message } = await this.getById({ id });
       if (status) { return { status, result }; }
       return { status, message };
@@ -76,67 +60,56 @@ export class ServiceModel extends Model {
 
   static async delete({ id }) {
     try {
-      await this.destroy({ where: { idService: id } });
-      return { status: true, message: 'Service deleted successfully' };
+      await this.destroy({ where: { idImagesService: id } });
+      return { status: true, message: 'Image deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 
-  static async getByCategory({ idCategory }) {
+  static async getByService({ idService }) {
     try {
-      const service = await this.findAll({
+      const images = await this.findAll({
         include: [
           {
-            model: CategoryModel,
-            as: 'category',
-            where: { idCategory: idCategory },
+            model: ServiceModel,
+            as: 'images',
+            where: { idService: idService },
           }
         ]
       }, { raw: true });
-      if (service !== null) return { status: true, result: service };
-      return { status: false, message: 'No services found for the specified category!' };
+      if (images !== null) return {
+        status: true, result: await images.map(item => {
+          const { images, ...filteredDataValues } = item.dataValues;
+          return filteredDataValues;
+        })
+      };
+      return { status: false, message: 'No Images found for the specified service!' };
     } catch (error) {
       return { status: false, message: error };
     }
   }
 }
-ServiceModel.init(
+ImagesServiceModel.init(
 
   {
-    idService: {
+    idImagesService: {
       type: Sequelize.INTEGER,
       autoIncrement: true,
       primaryKey: true
     },
-    imageUrlService: {
+    imageUrl: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    valueService: {
+    serviceId: {
       type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    nameService: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    categoryId: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    stateId: {
-      type: DataTypes.INTEGER,
-      allowNull: false
-    },
-    descriptionService: {
-      type: DataTypes.TEXT,
       allowNull: false
     }
   },
   {
     sequelize,
-    tableName: 'Services',
+    tableName: 'ImagesServices',
     underscored: true
   }
 );

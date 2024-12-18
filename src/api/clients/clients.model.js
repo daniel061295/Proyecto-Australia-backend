@@ -1,5 +1,5 @@
 /* eslint-disable space-before-function-paren */
-import { Sequelize, DataTypes, Model } from 'sequelize';
+import { Sequelize, DataTypes, Model, where } from 'sequelize';
 import { sequelize } from '../../config/database.js';
 
 export class ClientModel extends Model {
@@ -7,6 +7,15 @@ export class ClientModel extends Model {
     try {
       const clients = await this.findAll({ raw: true });
       return { status: true, result: clients };
+    } catch (error) {
+      return { status: false, result: error };
+    }
+  }
+  static async getByEmail({ emailClient }) {
+    try {
+      const clients = await this.findAll({ where: { emailClient } }, { raw: true });
+      if (clients.length > 0) return { status: true, result: clients[0].dataValues };
+      return { status: false, result: 'Client not found!' };
     } catch (error) {
       return { status: false, result: error };
     }
@@ -85,6 +94,7 @@ ClientModel.init(
     },
     emailClient: {
       type: DataTypes.STRING,
+      unique: true,
       allowNull: false
     },
     phoneNumberClient: {
