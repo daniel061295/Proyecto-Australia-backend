@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { ServiceController } from './services.controller.js';
 import { ServiceSchema } from './services.schema.js';
+import { uploadImageMiddleware } from '../../middlewares/upload.js';
 
 export const createServiceRouter = ({ serviceModel }) => {
   const serviceRouter = Router();
@@ -11,7 +12,7 @@ export const createServiceRouter = ({ serviceModel }) => {
   serviceRouter.get('/filter', serviceController.getByCategory);
 
   serviceRouter.get('/', serviceController.getAll);
-  serviceRouter.post('/', serviceController.create);
+  serviceRouter.post('/', uploadImageMiddleware, serviceController.create);
 
   serviceRouter.get('/:id', serviceController.getById);
   serviceRouter.delete('/:id', serviceController.delete);

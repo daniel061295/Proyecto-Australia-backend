@@ -7,16 +7,29 @@ export class ImagesServiceController extends Controller {
     if (!validationResult.success) {
       return res.status(422).json({ error: JSON.parse(validationResult.error.message) });
     }
-    if (!req.file) {
-      return res.status(422).json({ error: 'No file uploaded' })
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(422).json({ error: 'No files uploaded' });
     }
-    const payload = {
-      imageUrl: req.file.path,
-      ...validationResult.data
+
+    try {
+      const instances = await Promise.all(req.files.map(async (file) => {
+        const payload = {
+          imageUrl: file.path,
+          ...validationResult.data
+        };
+        return await this.Model.createNew({ input: payload });
+      }));
+
+      const successfulInstances = instances.filter(({ status }) => status);
+      if (successfulInstances.length === 0) {
+        return res.status(500).json({ message: "Error creating instances for all files." });
+      }
+
+      res.status(201).json(successfulInstances.map(({ result }) => result));
+    } catch (error) {
+      res.status(500).json({ message: `Error on create method: ${error.message}` });
     }
-    const { status, result } = await this.Model.createNew({ input: payload });
-    if (status) return res.status(201).json(result);
-    res.status(500).json({ message: `Error on create method: ${result}` });
   };
 
   delete = async (req, res) => {

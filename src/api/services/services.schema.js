@@ -8,10 +8,6 @@ export class ServiceSchema {
         invalid_type_error: 'nameService must be a string',
         required_error: 'name_service is required'
       }),
-      imageUrlService: z.string({
-        invalid_type_error: 'imageUrlService must be a string',
-        required_error: 'imageUrlService is required'
-      }).url({ message: 'imageUrlService must be a a valid url address' }),
       valueService: z.number({
         invalid_type_error: 'valueService must be a number',
         required_error: 'valueService is required'

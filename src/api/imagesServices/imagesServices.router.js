@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { ImagesServiceController } from './imagesServices.controller.js';
 import { ImagesServiceSchema } from './imagesServices.schema.js';
-import { uploadImageMiddleware } from '../../middlewares/upload.js';
+import { uploadImageMiddleware, uploadMultipleImagesMiddleware } from '../../middlewares/upload.js';
 
 export const createImagesServiceRouter = ({ imagesServiceModel }) => {
   const imagesServiceRouter = Router();
@@ -10,7 +10,7 @@ export const createImagesServiceRouter = ({ imagesServiceModel }) => {
   const imagesServiceController = new ImagesServiceController({ Model: imagesServiceModel, Schema: imagesServiceSchema });
 
   imagesServiceRouter.get('/', imagesServiceController.getAll);
-  imagesServiceRouter.post('/', uploadImageMiddleware, imagesServiceController.create);
+  imagesServiceRouter.post('/', uploadMultipleImagesMiddleware, imagesServiceController.create);
 
   imagesServiceRouter.get('/:id', imagesServiceController.getById);
   imagesServiceRouter.delete('/:id', imagesServiceController.delete);

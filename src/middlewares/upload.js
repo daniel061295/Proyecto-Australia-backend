@@ -36,4 +36,17 @@ export const uploadImageMiddleware = (req, res, next) => {
     }
     next();
   })
+
+};
+
+export const uploadMultipleImagesMiddleware = (req, res, next) => {
+  upload.array('files')(req, res, (err) => {
+    if (err) {
+      if (err.message === errorMessage) {
+        return res.status(400).json({ error: err.message });
+      }
+      return res.status(500).json({ error: "An unexpected error occurred while uploading the images: " + err.message });
+    }
+    next();
+  });
 };
