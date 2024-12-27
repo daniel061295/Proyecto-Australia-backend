@@ -41,6 +41,23 @@ export class MeetingController extends Controller {
     });
 
     return resultCreate.result;
+  };
+
+  getByFilter = async (req, res) => {
+    const column = Object.keys(req.query)[0];
+    const id = req.query[column];
+    const { status, result, message } = await this.Model.getByFilter({ column, id });
+    if (status) return res.json(result);
+    res.status(404).json({ message: `Error: ${message}` });
+  };
+
+  getByClientFilter = async (req, res) => {
+    const column = Object.keys(req.query)[0];
+    const value = req.query[column];
+    const { status, result, message } = await this.Model.getByClientFilter({ column, value });
+    if (status) return res.json(result);
+    res.status(404).json({ message: `Error: ${message}` });
+
   }
 
 }

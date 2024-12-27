@@ -94,7 +94,7 @@ ClientModel.init(
     },
     emailClient: {
       type: DataTypes.STRING,
-      unique: true,
+      // unique: true,
       allowNull: false
     },
     phoneNumberClient: {
