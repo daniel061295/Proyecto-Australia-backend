@@ -41,7 +41,7 @@ export class ServiceController extends Controller {
           images: imagesResult.result
         })
       } else {
-        return res.status(200).json({ result })
+        return res.status(200).json({ message })
       }
     }
     res.status(500).json({ message: result });

@@ -15,7 +15,15 @@ export class ServiceModel extends Model {
 
   static async getById({ id }) {
     try {
-      const service = await this.findByPk(id, { raw: true });
+      const service = await this.findByPk(id, {
+        raw: true, include: [
+          {
+            model: CategoryModel,
+            as: 'category',
+            attributes: ['nameCategory'],
+          }
+        ]
+      });
       if (service !== null) return { status: true, result: service };
       return { status: false, message: 'service not found!' };
     } catch (error) {
