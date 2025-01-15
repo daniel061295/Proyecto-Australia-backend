@@ -1,4 +1,4 @@
 /* eslint-disable space-before-function-paren */
-import { Controller } from '../../libs/Controller.js';
+import { BaseController } from '../../libs/BaseController.js';
 
-export class ClientController extends Controller { }
+export class ClientController extends BaseController { }

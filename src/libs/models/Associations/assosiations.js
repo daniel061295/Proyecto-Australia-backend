@@ -3,6 +3,8 @@ import { CategoryModel } from '../../../api/categories/categories.model.js'
 import { ImagesServiceModel } from '../../../api/imagesServices/imagesServices.model.js'
 import { MeetingModel } from "../../../api/meetings/meetings.model.js";
 import { ClientModel } from "../../../api/clients/clients.model.js";
+import { DateModel } from '../../../api/dates/dates.model.js'
+import { ScheduleModel } from "../../../api/schedules/schedules.model.js";
 
 CategoryModel.hasMany(ServiceModel, {
   foreignKey: 'categoryId',
@@ -33,4 +35,13 @@ ClientModel.hasMany(MeetingModel, {
   // as: 'clients'
 });
 
-export { ServiceModel, CategoryModel, ImagesServiceModel, MeetingModel, ClientModel };
+DateModel.hasMany(ScheduleModel, {
+  foreignKey: 'idDate',
+  onDelete: 'CASCADE'
+});
+ScheduleModel.belongsTo(DateModel, {
+  foreignKey: 'idDate',
+  as: 'date',
+});
+
+export { ServiceModel, CategoryModel, ImagesServiceModel, MeetingModel, ClientModel, DateModel, ScheduleModel };

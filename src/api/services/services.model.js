@@ -2,17 +2,9 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../../config/database.js';
 import { CategoryModel } from '../categories/categories.model.js';
+import { BaseModel } from '../../libs/BaseModel.js';
 
-export class ServiceModel extends Model {
-  static async getAll() {
-    try {
-      const services = await this.findAll({ raw: true });
-      return { status: true, result: services };
-    } catch (error) {
-      return { status: false, message: error };
-    }
-  }
-
+export class ServiceModel extends BaseModel {
   static async getById({ id }) {
     try {
       const service = await this.findByPk(id, {
@@ -26,66 +18,6 @@ export class ServiceModel extends Model {
       });
       if (service !== null) return { status: true, result: service };
       return { status: false, message: 'service not found!' };
-    } catch (error) {
-      return { status: false, message: error };
-    }
-  }
-
-  static async createNew({ input }) {
-    const {
-      imageUrlService,
-      valueService,
-      nameService,
-      categoryId,
-      stateId,
-      descriptionService
-    } = input;
-    try {
-      const service = await this.create({
-        imageUrlService,
-        valueService,
-        nameService,
-        categoryId,
-        stateId,
-        descriptionService
-      });
-      const plainService = service.get({ plain: true });
-      return { status: true, result: plainService };
-    } catch (error) {
-      return { status: false, message: error };
-    }
-  }
-
-  static async updateByPk({ id, input }) {
-    const {
-      imageUrlService,
-      valueService,
-      nameService,
-      categoryId,
-      stateId,
-      descriptionService
-    } = input;
-    try {
-      await this.update({
-        imageUrlService,
-        valueService,
-        nameService,
-        categoryId,
-        stateId,
-        descriptionService
-      }, { where: { idService: id } });
-      const { status, result, message } = await this.getById({ id });
-      if (status) { return { status, result }; }
-      return { status, message };
-    } catch (error) {
-      return { status: false, message: error };
-    }
-  }
-
-  static async delete({ id }) {
-    try {
-      await this.destroy({ where: { idService: id } });
-      return { status: true, message: 'Service deleted successfully' };
     } catch (error) {
       return { status: false, message: error };
     }

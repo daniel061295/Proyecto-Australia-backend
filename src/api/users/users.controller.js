@@ -1,11 +1,11 @@
 /* eslint-disable space-before-function-paren */
-import { Controller } from '../../libs/Controller.js';
+import { BaseController } from '../../libs/BaseController.js';
 import { LoginUserSchema } from './users.schema.js';
 import { SECRET_JWT_KEY } from '../../config.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
-export class UserController extends Controller {
+export class UserController extends BaseController {
   create = async (req, res) => {
     const validationResult = this.Schema.validate(req.body);
     if (!validationResult.success) {

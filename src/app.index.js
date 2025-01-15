@@ -13,6 +13,8 @@ import { createStateRouter, StateModel } from './api/states/states.index.js';
 import { createSubmenuRouter, SubmenuModel } from './api/submenus/submenus.index.js';
 import { createUserRouter, UserModel } from './api/users/users.index.js';
 import { createImagesServiceRouter, ImagesServiceModel } from './api/imagesServices/imagesServices.index.js';
+import { createDateRouter, DateModel } from './api/dates/dates.index.js';
+import { createScheduleRouter, ScheduleModel } from './api/schedules/schedules.index.js';
 
 const app = express();
 await initializeDatabase();
@@ -34,6 +36,8 @@ app.use('/states', createStateRouter({ stateModel: StateModel }));
 app.use('/submenus', createSubmenuRouter({ submenuModel: SubmenuModel }));
 app.use('/users', createUserRouter({ userModel: UserModel }));
 app.use('/imagesservices', createImagesServiceRouter({ imagesServiceModel: ImagesServiceModel }));
+app.use('/dates', createDateRouter({ dateModel: DateModel }));
+app.use('/schedules', createScheduleRouter({ scheduleModel: ScheduleModel }));
 
 const PORT = process.env.PORT ?? 8080;
 app.listen(PORT, () => {

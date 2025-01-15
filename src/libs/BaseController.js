@@ -1,14 +1,14 @@
 /* eslint-disable space-before-function-paren */
-export class Controller {
+export class BaseController {
   constructor({ Model, Schema }) {
     this.Model = Model;
     this.Schema = Schema;
   }
 
   getAll = async (req, res) => {
-    const { status, result } = await this.Model.getAll();
+    const { status, result, message } = await this.Model.getAll();
     if (status) return res.json(result);
-    res.status(500).json({ message: `Error on get method: ${result}` });
+    res.status(500).json({ message: `Error on get method: ${message}` });
   };
 
   getById = async (req, res) => {
@@ -23,9 +23,9 @@ export class Controller {
     if (!validationResult.success) {
       return res.status(422).json({ error: JSON.parse(validationResult.error.message) });
     }
-    const { status, result } = await this.Model.createNew({ input: validationResult.data });
+    const { status, result, message } = await this.Model.createNew({ input: validationResult.data });
     if (status) return res.status(201).json(result);
-    res.status(500).json({ message: `Error on create method: ${result}` });
+    res.status(500).json({ message: `Error on create method: ${message}` });
   };
 
   delete = async (req, res) => {

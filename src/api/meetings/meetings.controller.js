@@ -1,9 +1,9 @@
 /* eslint-disable space-before-function-paren */
-import { Controller } from '../../libs/Controller.js';
+import { BaseController } from '../../libs/BaseController.js';
 import { MeetingWithClientSchema } from './meetings.schema.js'
 import { ClientModel } from '../clients/clients.model.js';
 
-export class MeetingController extends Controller {
+export class MeetingController extends BaseController {
   createMeetingWithClient = async (req, res) => {
     const meetingWithClientSchema = new MeetingWithClientSchema;
     const validationResult = meetingWithClientSchema.validate(req.body);

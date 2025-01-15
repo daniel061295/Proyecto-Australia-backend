@@ -1,7 +1,7 @@
-import { Controller } from '../../libs/Controller.js';
+import { BaseController } from '../../libs/BaseController.js';
 import { deleteFile } from '../../libs/utils/deleteFile.js';
 
-export class ImagesServiceController extends Controller {
+export class ImagesServiceController extends BaseController {
   create = async (req, res) => {
     const validationResult = this.Schema.validate(req.body);
     if (!validationResult.success) {

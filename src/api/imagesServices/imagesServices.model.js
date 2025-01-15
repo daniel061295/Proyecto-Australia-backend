@@ -2,71 +2,9 @@
 import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../../config/database.js';
 import { ServiceModel } from '../services/services.model.js';
+import { BaseModel } from '../../libs/BaseModel.js';
 
-export class ImagesServiceModel extends Model {
-  static async getAll() {
-    try {
-      const services = await this.findAll({ raw: true });
-      return { status: true, result: services };
-    } catch (error) {
-      return { status: false, message: error };
-    }
-  }
-
-  static async getById({ id }) {
-    try {
-      const service = await this.findByPk(id, { raw: true });
-      if (service !== null) return { status: true, result: service };
-      return { status: false, message: 'image not found!' };
-    } catch (error) {
-      return { status: false, message: error };
-    }
-  }
-
-  static async createNew({ input }) {
-    const {
-      imageUrl,
-      serviceId
-    } = input;
-    try {
-      const service = await this.create({
-        imageUrl,
-        serviceId
-      });
-      const plainService = service.get({ plain: true });
-      return { status: true, result: plainService };
-    } catch (error) {
-      return { status: false, result: error };
-    }
-  }
-
-  static async updateByPk({ id, input }) {
-    const {
-      imageUrl,
-      serviceId
-    } = input;
-    try {
-      await this.update({
-        imageUrl,
-        serviceId
-      }, { where: { idImagesService: id } });
-      const { status, result, message } = await this.getById({ id });
-      if (status) { return { status, result }; }
-      return { status, message };
-    } catch (error) {
-      return { status: false, message: error };
-    }
-  }
-
-  static async delete({ id }) {
-    try {
-      await this.destroy({ where: { idImagesService: id } });
-      return { status: true, message: 'Image deleted successfully' };
-    } catch (error) {
-      return { status: false, message: error };
-    }
-  }
-
+export class ImagesServiceModel extends BaseModel {
   static async getByService({ idService }) {
     try {
       const images = await this.findAll({

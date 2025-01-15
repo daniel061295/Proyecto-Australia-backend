@@ -1,9 +1,9 @@
 /* eslint-disable space-before-function-paren */
-import { Controller } from '../../libs/Controller.js';
+import { BaseController } from '../../libs/BaseController.js';
 import { deleteFile } from '../../libs/utils/deleteFile.js';
 
 
-export class CategoryController extends Controller {
+export class CategoryController extends BaseController {
   create = async (req, res) => {
     const validationResult = this.Schema.validate(req.body);
     if (!validationResult.success) {
