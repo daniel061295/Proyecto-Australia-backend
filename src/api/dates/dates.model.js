@@ -16,6 +16,10 @@ DateModel.init(
       type: DataTypes.DATEONLY,
       // unique: true,
       allowNull: false
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false
     }
   },
   {

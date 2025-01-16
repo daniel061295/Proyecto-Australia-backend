@@ -35,10 +35,10 @@ export class MeetingSchema {
 export class MeetingWithClientSchema {
   constructor() {
     this.meetingWithClientSchema = z.object({
-      dateTimeMeeting: z.string({
-        invalid_type_error: 'dateTimeMeeting must be a string',
-        required_error: 'dateTimeMeeting is required'
-      }).datetime({ message: 'dateTimeMeeting must be a valid date time format: YYYY-MM-DDTHH:mm:ssZ' }),
+      scheduleId: z.number({
+        invalid_type_error: 'scheduleId must be a string',
+        required_error: 'scheduleId is required'
+      }).positive(),
       stateId: z.number({
         invalid_type_error: 'stateId must be a number',
         required_error: 'stateId is required'

@@ -7,7 +7,11 @@ export class DateSchema {
       dateString: z.string({
         invalid_type_error: 'dateString must be a valid string',
         required_error: 'dateString is required'
-      }).date({ message: 'dateString must be a date format string' })
+      }).date({ message: 'dateString must be a date format string' }),
+      isActive: z.boolean({
+        invalid_type_error: 'isActive must be a valid boolean',
+        required_error: 'isActive is required'
+      }),
     });
   }
 

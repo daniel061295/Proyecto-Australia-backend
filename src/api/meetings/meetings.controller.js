@@ -16,7 +16,7 @@ export class MeetingController extends BaseController {
 
     const { status, result, message } = await this.Model.createNew({
       input: {
-        dateTimeMeeting: validatedData.dateTimeMeeting,
+        scheduleId: validatedData.scheduleId,
         stateId: validatedData.stateId,
         clientId: client.idClient,
         serviceId: validatedData.serviceId

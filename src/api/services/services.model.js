@@ -3,8 +3,32 @@ import { Sequelize, DataTypes, Model } from 'sequelize';
 import { sequelize } from '../../config/database.js';
 import { CategoryModel } from '../categories/categories.model.js';
 import { BaseModel } from '../../libs/BaseModel.js';
+import { StateModel } from '../states/states.model.js';
 
 export class ServiceModel extends BaseModel {
+  static getIncludes() {
+    return [
+      {
+        model: CategoryModel,
+        as: 'category',
+      },
+      {
+        model: StateModel,
+        as: 'state'
+      },
+    ];
+  }
+  static async getAll() {
+    try {
+      const records = await this.findAll({
+        attributes: { exclude: ['categoryId', 'stateId'] },
+        include: this.getIncludes(),
+      });
+      return { status: true, result: records };
+    } catch (error) {
+      return { status: false, message: error.message };
+    }
+  }
   static async getById({ id }) {
     try {
       const service = await this.findByPk(id, {

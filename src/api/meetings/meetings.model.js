@@ -2,10 +2,74 @@
 import { Sequelize, DataTypes, Model, Op } from 'sequelize';
 import { sequelize } from '../../config/database.js';
 
-import { ClientModel } from '../clients/clients.index.js';
 import { BaseModel } from '../../libs/BaseModel.js';
+import { ClientModel } from '../clients/clients.index.js';
+import { ServiceModel } from '../services/services.model.js';
+import { CategoryModel } from '../categories/categories.model.js';
+import { StateModel } from '../states/states.model.js';
+import { ScheduleModel } from '../schedules/schedules.model.js';
+import { DateModel } from '../dates/dates.model.js';
 
 export class MeetingModel extends BaseModel {
+  static getIncludes(clientFilter = {}) {
+    return [
+      {
+        model: ClientModel,
+        as: 'client',
+        where: clientFilter
+      },
+      {
+        model: StateModel,
+        as: 'state'
+      },
+      {
+        model: ScheduleModel,
+        as: 'schedule',
+        attributes: { exclude: ['idDate'] },
+        include: [
+          {
+            model: DateModel,
+            as: 'date'
+          }
+        ]
+      },
+      {
+        model: ServiceModel,
+        as: 'service',
+        attributes: { exclude: ['categoryId'] },
+        include: [
+          {
+            model: CategoryModel,
+            as: 'category'
+          }
+        ]
+      },
+
+    ];
+  }
+  static async getAll() {
+    try {
+      const records = await this.findAll({
+        attributes: ['idMeeting'],
+        include: this.getIncludes(),
+      });
+      return { status: true, result: records };
+    } catch (error) {
+      return { status: false, message: error.message };
+    }
+  }
+  static async getById({ id }) {
+    try {
+      const record = await this.findByPk(id, {
+        attributes: ['idMeeting'],
+        include: this.getIncludes(),
+      });
+      if (record) return { status: true, result: record };
+      return { status: false, message: 'Record not found!' };
+    } catch (error) {
+      return { status: false, message: error.message };
+    }
+  }
 
   static async getByFilter({ column, id }) {
     const attributes = await this.getAttributes();
@@ -14,9 +78,11 @@ export class MeetingModel extends BaseModel {
     }
     try {
       const meetings = await this.findAll({
-        where: { [column]: id }
-      }, { raw: true });
-      if (meetings !== null) return { status: true, result: meetings };
+        where: { [column]: id },
+        attributes: ['idMeeting'],
+        include: this.getIncludes(),
+      });
+      if (meetings.length > 0) return { status: true, result: meetings };
       return { status: false, message: `No meetings found for the specified ${column}!` };
     } catch (error) {
       return { status: false, message: error };
@@ -29,20 +95,14 @@ export class MeetingModel extends BaseModel {
     }
     try {
       const meetings = await this.findAll({
-        include: [
-          {
-            model: ClientModel,
-            as: 'client',
-            where: {
-              [column]: {
-                [Op.like]: `%${value}%`
-              },
-            },
+        include: this.getIncludes({
+          [column]: {
+            [Op.like]: `%${value}%`
           },
-        ],
-        attributes: { exclude: 'clientId' }
-      }, { raw: true });
-      if (meetings !== null) return { status: true, result: meetings };
+        }),
+        attributes: ['idMeeting']
+      });
+      if (meetings.length > 0) return { status: true, result: meetings };
       return { status: false, message: `No meetings found for the specified ${column}!` };
     } catch (error) {
       return { status: false, message: error };
@@ -58,8 +118,8 @@ MeetingModel.init(
       autoIncrement: true,
       primaryKey: true
     },
-    dateTimeMeeting: {
-      type: DataTypes.DATE,
+    scheduleId: {
+      type: Sequelize.INTEGER,
       allowNull: false
     },
     stateId: {
