@@ -38,7 +38,8 @@ ClientModel.hasMany(MeetingModel, {
 
 DateModel.hasMany(ScheduleModel, {
   foreignKey: 'idDate',
-  onDelete: 'CASCADE'
+  onDelete: 'CASCADE',
+  as: 'schedules'
 });
 
 ScheduleModel.belongsTo(DateModel, {

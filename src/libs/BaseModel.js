@@ -32,8 +32,9 @@ export class BaseModel extends Model {
   }
 
   static async updateByPk({ id, input }) {
+    const idColumn = this.primaryKeyAttributes[0]
     try {
-      const updatedCount = await this.update(input, { where: { id } });
+      const updatedCount = await this.update(input, { where: { [idColumn]: id } });
       if (updatedCount[0] === 0) return { status: false, message: 'Record not found or no changes made.' };
       const updatedRecord = await this.getById({ id });
       return updatedRecord;
@@ -44,7 +45,8 @@ export class BaseModel extends Model {
 
   static async delete({ id }) {
     try {
-      const deletedCount = await this.destroy({ where: { id } });
+      const idColumn = this.primaryKeyAttributes[0]
+      const deletedCount = await this.destroy({ where: { [idColumn]: id } });
       if (deletedCount === 0) return { status: false, message: 'Record not found!' };
       return { status: true, message: 'Record deleted successfully' };
     } catch (error) {

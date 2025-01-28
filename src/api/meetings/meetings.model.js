@@ -50,7 +50,7 @@ export class MeetingModel extends BaseModel {
   static async getAll() {
     try {
       const records = await this.findAll({
-        attributes: ['idMeeting'],
+        attributes: ['idMeeting', 'documentUrlMeeting'],
         include: this.getIncludes(),
       });
       return { status: true, result: records };
@@ -61,7 +61,7 @@ export class MeetingModel extends BaseModel {
   static async getById({ id }) {
     try {
       const record = await this.findByPk(id, {
-        attributes: ['idMeeting'],
+        attributes: ['idMeeting', 'documentUrlMeeting'],
         include: this.getIncludes(),
       });
       if (record) return { status: true, result: record };
@@ -79,7 +79,7 @@ export class MeetingModel extends BaseModel {
     try {
       const meetings = await this.findAll({
         where: { [column]: id },
-        attributes: ['idMeeting'],
+        attributes: ['idMeeting', 'documentUrlMeeting'],
         include: this.getIncludes(),
       });
       if (meetings.length > 0) return { status: true, result: meetings };
@@ -100,7 +100,7 @@ export class MeetingModel extends BaseModel {
             [Op.like]: `%${value}%`
           },
         }),
-        attributes: ['idMeeting']
+        attributes: ['idMeeting', 'documentUrlMeeting']
       });
       if (meetings.length > 0) return { status: true, result: meetings };
       return { status: false, message: `No meetings found for the specified ${column}!` };
@@ -133,6 +133,10 @@ MeetingModel.init(
     serviceId: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    documentUrlMeeting: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   },
   {

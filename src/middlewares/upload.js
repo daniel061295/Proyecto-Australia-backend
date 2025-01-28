@@ -1,52 +1,76 @@
 import multer from "multer";
 import path from "path";
+import fs from "fs";
 
-const errorMessage = "Invalid file format. Only JPEG, PNG, and GIF are allowed."
+const errorMessage = "Invalid file format. Only JPEG, PNG, and GIF are allowed.";
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './static')
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname)
-  }
-})
+const createUploadMiddleware = (destinationPath, filter) => {
 
-const upload = multer({
-  storage, fileFilter: (req, file, cb) => {
-    const fileTypes = /jpeg|jpg|png|gif/;
-    const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = fileTypes.test(file.mimetype);
-
-    if (extname && mimetype) {
-      cb(null, true);
-    } else {
-      cb(new Error(errorMessage));
+  const ensureDirectoryExists = (dirPath) => {
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true }); // Crea las carpetas necesarias
     }
-  }
-});
+  };
 
-export const uploadImageMiddleware = (req, res, next) => {
-  upload.single('file')(req, res, (err) => {
-    if (err) {
-      if (err.message === errorMessage) {
-        return res.status(400).json({ error: err.message });
-      }
-      return res.status(500).json({ error: "An unexpected error occurred while uploading the image." + err.message });
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      ensureDirectoryExists(destinationPath);
+      cb(null, destinationPath); // Usa la ruta definida al configurar el middleware
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.originalname);
     }
-    next();
-  })
-
-};
-
-export const uploadMultipleImagesMiddleware = (req, res, next) => {
-  upload.array('files')(req, res, (err) => {
-    if (err) {
-      if (err.message === errorMessage) {
-        return res.status(400).json({ error: err.message });
-      }
-      return res.status(500).json({ error: "An unexpected error occurred while uploading the images: " + err.message });
-    }
-    next();
   });
+
+  const upload = multer({
+    storage,
+    fileFilter: (req, file, cb) => {
+      const fileTypes = filter;
+      const extname = fileTypes.test(path.extname(file.originalname).toLowerCase());
+      const mimetype = fileTypes.test(file.mimetype);
+
+      if (extname && mimetype) {
+        cb(null, true);
+      } else {
+        cb(new Error(errorMessage));
+      }
+    }
+  });
+
+  return {
+    singleFileMiddleware: (req, res, next) => {
+      upload.single('file')(req, res, (err) => {
+        if (err) {
+          if (err.message === errorMessage) {
+            return res.status(400).json({ error: err.message });
+          }
+          return res.status(500).json({ error: "An unexpected error occurred while uploading the image: " + err.message });
+        }
+        next();
+      });
+    },
+    multipleFilesMiddleware: (req, res, next) => {
+      upload.array('files')(req, res, (err) => {
+        if (err) {
+          if (err.message === errorMessage) {
+            return res.status(400).json({ error: err.message });
+          }
+          return res.status(500).json({ error: "An unexpected error occurred while uploading the images: " + err.message });
+        }
+        next();
+      });
+    }
+  };
 };
+
+const uploadImagesToStatic = createUploadMiddleware('./static', /jpeg|jpg|png|gif/)
+const uploadImageMiddleware = uploadImagesToStatic.singleFileMiddleware
+const uploadMultipleImagesMiddleware = uploadImagesToStatic.multipleFilesMiddleware
+
+const uploadPdfToStaticDocs = createUploadMiddleware('./static/docs', /pdf/)
+const uploadDocumentMiddleware = uploadPdfToStaticDocs.singleFileMiddleware
+const uploadMultipleDocumentsMiddleware = uploadPdfToStaticDocs.multipleFilesMiddleware
+
+export { uploadImageMiddleware, uploadMultipleImagesMiddleware, uploadDocumentMiddleware, uploadMultipleDocumentsMiddleware }
+// app.post('/upload-single', singleFileMiddleware);
+// app.post('/upload-multiple', multipleFilesMiddleware);

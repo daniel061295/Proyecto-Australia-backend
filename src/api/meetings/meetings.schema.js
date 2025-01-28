@@ -3,23 +3,29 @@ import { z } from 'zod';
 
 export class MeetingSchema {
   constructor() {
+    const numberOrString = z.union([
+      z.number(),
+      z.string().refine((val) => !isNaN(Number(val)), {
+        message: "Must be a valid number or a numeric string",
+      }).transform((val) => Number(val))
+    ]);
     this.meetingSchema = z.object({
-      dateTimeMeeting: z.string({
-        invalid_type_error: 'dateTimeMeeting must be a string',
-        required_error: 'dateTimeMeeting is required'
-      }).datetime({ message: 'dateTimeMeeting must be a valid date time format: YYYY-MM-DDTHH:mm:ssZ' }),
-      stateId: z.number({
-        invalid_type_error: 'stateId must be a number',
-        required_error: 'stateId is required'
+      scheduleId: numberOrString.refine((val) => !isNaN(val), {
+        message: "scheduleId must be a valid number",
+        required_error: "scheduleId is required"
       }),
-      clientId: z.number({
-        invalid_type_error: 'clientId must be a number',
-        required_error: 'clientId is required'
+      stateId: numberOrString.refine((val) => !isNaN(val), {
+        message: "stateId must be a valid number",
+        required_error: "stateId is required"
       }),
-      serviceId: z.number({
-        invalid_type_error: 'serviceId must be a number',
-        required_error: 'serviceId is required'
-      })
+      clientId: numberOrString.refine((val) => !isNaN(val), {
+        message: "clientId must be a valid number",
+        required_error: "clientId is required"
+      }),
+      serviceId: numberOrString.refine((val) => !isNaN(val), {
+        message: "serviceId must be a valid number",
+        required_error: "serviceId is required"
+      }),
     });
   }
 
@@ -34,31 +40,32 @@ export class MeetingSchema {
 
 export class MeetingWithClientSchema {
   constructor() {
+    const numberOrString = z.union([
+      z.number(),
+      z.string()
+    ]).refine((val) => !isNaN(Number(val)), {
+      message: "Must be a valid number or a numeric string",
+    }).transform((val) => Number(val));
     this.meetingWithClientSchema = z.object({
-      scheduleId: z.number({
-        invalid_type_error: 'scheduleId must be a string',
-        required_error: 'scheduleId is required'
-      }).positive(),
-      stateId: z.number({
-        invalid_type_error: 'stateId must be a number',
-        required_error: 'stateId is required'
+      scheduleId: numberOrString.refine((val) => !isNaN(val), {
+        message: "scheduleId must be a valid number"
+      }),
+      stateId: numberOrString.refine((val) => !isNaN(val), {
+        message: "stateId must be a valid number"
       }),
       nameClient: z.string({
-        invalid_type_error: 'nameClient must be a string',
-        required_error: 'nameClient is required'
+        invalid_type_error: 'nameClient must be a string'
       }),
       emailClient: z.string({
-        invalid_type_error: 'emailClient must be a string',
-        required_error: 'emailClient is required'
+        invalid_type_error: 'emailClient must be a string'
       }).email({ message: 'emailClient must be a a valid email address' }),
-      phoneNumberClient: z.number({
-        invalid_type_error: 'phoneNumberClient must be a big integer',
-        required_error: 'phoneNumberClient is required'
-      }).int(),
-      serviceId: z.number({
-        invalid_type_error: 'serviceId must be a number',
-        required_error: 'serviceId is required'
-      })
+      phoneNumberClient: numberOrString.refine((val) => !isNaN(val), {
+        message: "phoneNumberClient must be a valid number",
+        required_error: "phoneNumberClient is required"
+      }),
+      serviceId: numberOrString.refine((val) => !isNaN(val), {
+        message: "serviceId must be a valid number"
+      }),
     });
   }
   validate(input) {
