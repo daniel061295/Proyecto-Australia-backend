@@ -1,6 +1,7 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import { vectortile_v1 } from "googleapis";
 
 const errorMessage = "Invalid file format. Only JPEG, PNG, and GIF are allowed.";
 
@@ -40,22 +41,27 @@ const createUploadMiddleware = (destinationPath, filter) => {
   return {
     singleFileMiddleware: (req, res, next) => {
       upload.single('file')(req, res, (err) => {
-        if (err) {
-          if (err.message === errorMessage) {
-            return res.status(400).json({ error: err.message });
+        if (req.file) {
+          if (err) {
+            if (err.message === errorMessage) {
+              return res.status(400).json({ error: err.message });
+            }
+            return res.status(500).json({ error: "An unexpected error occurred while uploading the image: " + err.message });
           }
-          return res.status(500).json({ error: "An unexpected error occurred while uploading the image: " + err.message });
         }
         next();
       });
+
     },
     multipleFilesMiddleware: (req, res, next) => {
       upload.array('files')(req, res, (err) => {
-        if (err) {
-          if (err.message === errorMessage) {
-            return res.status(400).json({ error: err.message });
+        if (req.file) {
+          if (err) {
+            if (err.message === errorMessage) {
+              return res.status(400).json({ error: err.message });
+            }
+            return res.status(500).json({ error: "An unexpected error occurred while uploading the images: " + err.message });
           }
-          return res.status(500).json({ error: "An unexpected error occurred while uploading the images: " + err.message });
         }
         next();
       });

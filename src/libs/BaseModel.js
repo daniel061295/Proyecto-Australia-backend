@@ -35,7 +35,7 @@ export class BaseModel extends Model {
     const idColumn = this.primaryKeyAttributes[0]
     try {
       const updatedCount = await this.update(input, { where: { [idColumn]: id } });
-      if (updatedCount[0] === 0) return { status: false, message: 'Record not found or no changes made.' };
+      // if (updatedCount[0] === 0) return { status: false, message: 'Record not found or no changes made.' };
       const updatedRecord = await this.getById({ id });
       return updatedRecord;
     } catch (error) {

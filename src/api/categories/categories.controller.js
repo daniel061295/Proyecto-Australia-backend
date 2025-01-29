@@ -9,11 +9,11 @@ export class CategoryController extends BaseController {
     if (!validationResult.success) {
       return res.status(422).json({ error: JSON.parse(validationResult.error.message) });
     }
-    if (!req.file) {
-      return res.status(422).json({ error: 'No file uploaded' })
-    }
+    // if (!req.file) {
+    //   return res.status(422).json({ error: 'No file uploaded' })
+    // }
     const payload = {
-      imageUrlCategory: req.file.path,
+      imageUrlCategory: req.file ? req.file.path : '',
       ...validationResult.data
     }
     const { status, result } = await this.Model.createNew({ input: payload });
@@ -31,14 +31,16 @@ export class CategoryController extends BaseController {
       }
 
       const { imageUrlCategory } = byId.result;
-      const fileResult = await deleteFile(imageUrlCategory);
-
-      if (!fileResult.success) {
-        const errorMessage = fileResult.errorCode === 'ENOENT'
-          ? 'File not found!'
-          : 'Error deleting the file.';
-        return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ error: errorMessage });
+      if (imageUrlCategory !== '') {
+        const fileResult = await deleteFile(imageUrlCategory);
+        if (!fileResult.success) {
+          const errorMessage = fileResult.errorCode === 'ENOENT'
+            ? 'File not found!'
+            : 'Error deleting the file.';
+          return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ error: errorMessage });
+        }
       }
+
 
       const { status, message } = await this.Model.delete({ id });
       if (!status) {
