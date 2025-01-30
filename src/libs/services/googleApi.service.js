@@ -1,13 +1,10 @@
 import fs from "fs";
 import { google } from "googleapis";
-// import mime from 'mime'
 import googleApiKey from "../../../api_key.json" assert { type: "json" };
 import { FOLDERID, GOOGLE_API_CLIENT_ID, GOOGLE_API_CLIENT_SECRET, GOOGLE_API_REDIRECT_URI, REFRESH_TOKEN } from '../../config.js'
 
 
 const SCOPE = ['https://www.googleapis.com/auth/drive'];
-
-// const file = './static/docs/PAGOS VANTI.pdf';
 
 
 export const authorize = async () => {
@@ -17,7 +14,6 @@ export const authorize = async () => {
     googleApiKey.private_key,
     SCOPE
   )
-
   await jwtClient.authorize();
   return jwtClient;
 }
@@ -28,12 +24,10 @@ export const authorizeOAuth2Client = async () => {
     GOOGLE_API_CLIENT_SECRET,
     GOOGLE_API_REDIRECT_URI
   )
-
   await oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
   return oAuth2Client;
 }
-
 
 export const uploadFile = async (authClient, file, folderId) => {
   return new Promise((resolve, reject) => {
@@ -92,27 +86,4 @@ export const downloadFile = async (authClient, fileId) => {
     { responseType: "stream" }
   );
   return res.data;
-  // const dest = fs.createWriteStream(fileName);
-  // console.log(fileName);
-  // res.data
-  //   .on('end', () => console.log('Archivo descargado.'))
-  //   .on('error', (err) => console.error('Error al descargar:', err))
-  //   .pipe(dest);
 }
-
-// console.log({ FOLDERID, GOOGLE_API_CLIENT_ID, GOOGLE_API_CLIENT_SECRET, GOOGLE_API_REDIRECT_URI, REFRESH_TOKEN })
-// const folderId = FOLDERID;
-// const authClient = await authorize();
-
-// const authClient = await authorizeOAuth2Client();
-
-// const files = await listFiles(authClient, folderId);
-
-// files.map((file) => {
-//   console.log(file);
-// });
-// const fileId = files[0].id;
-// const fileId = '15IpeOLLQ1t39QLEhkfnnvNbrokHNjpFR'
-// downloadFile(authClient, fileId);
-//
-// console.log(fileId);

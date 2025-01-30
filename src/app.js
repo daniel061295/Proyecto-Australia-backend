@@ -2,7 +2,6 @@ import express, { json } from 'express';
 import { initializeDatabase } from './config/database.js';
 import cookieParser from 'cookie-parser';
 import { corsMiddleware, verityToken, jsonErrorHandler } from './middlewares/index.js';
-import { PORT } from './config.js';
 
 import { createImagesServiceRouter, ImagesServiceModel } from './api/imagesServices/imagesServices.index.js';
 import { createCategoryRouter, CategoryModel } from './api/categories/categories.index.js';
@@ -40,6 +39,5 @@ app.use('/menus', createMenuRouter({ menuModel: MenuModel }));
 app.use('/users', createUserRouter({ userModel: UserModel }));
 app.use('/dates', createDateRouter({ dateModel: DateModel }));
 
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-});
+
+export { app };

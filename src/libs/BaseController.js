@@ -1,3 +1,5 @@
+import { deleteFile } from "./utils/deleteFile.js";
+
 /* eslint-disable space-before-function-paren */
 export class BaseController {
   constructor({ Model, Schema }) {
@@ -53,5 +55,69 @@ export class BaseController {
     if (status) return res.status(201).json(result);
     if (message) return res.status(404).json({ message });
     res.status(500).json({ message: `Error on update method: ${result}` });
+  };
+
+  deleteWithFile = async (req, res, fileColumn) => {
+    const { id } = req.params;
+
+    try {
+      const byId = await this.Model.getById({ id });
+      if (!byId.status) {
+        return res.status(404).json({ message: `Object with id: ${id} not found` });
+      }
+
+      this.deleteFileIfExists(byId, fileColumn);
+
+      const { status, message } = await this.Model.delete({ id });
+      if (!status) {
+        return res.status(404).json({ message });
+      }
+
+      return res.status(200).json({ message });
+
+    } catch (error) {
+      console.error(`Error in delete handler: ${error.message}`);
+      return res.status(500).json({ error: 'Internal server error.' });
+    }
+  };
+
+  deleteFileIfExists = async (context, column) => {
+    const filePath = context.result[column];
+
+    const fileResult = await deleteFile(filePath);
+    if (!fileResult.success && fileResult.errorCode !== 'ENOENT') {
+      return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ error: 'Error deleting the file.' });
+    }
+  };
+
+  updateWithFile = async (req, res, fileColumn) => {
+    const { id } = req.params;
+    try {
+      const byId = await this.Model.getById({ id });
+      if (!byId.status) {
+        return res.status(404).json({ message: `Object with id: ${id} not found` });
+      }
+      const validationResult = this.Schema.validatePartial(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({ error: JSON.parse(validationResult.error.message) });
+      }
+      let payload = validationResult.data;
+
+      if (req.file) {
+        this.deleteFileIfExists(byId, fileColumn);
+        payload = { ...payload, [fileColumn]: req.file.path };
+      }
+
+      const { status, result, message } = await this.Model.updateByPk({ id, input: payload });
+
+      if (status) return res.status(200).json(result);
+      if (message) return res.status(404).json({ message });
+
+      return res.status(500).json({ message: `Error on update method: ${result}` });
+
+    } catch (error) {
+      console.error(`Error in update handler: ${error.message}`);
+      return res.status(500).json({ error: 'Internal server error.' });
+    }
   };
 }
