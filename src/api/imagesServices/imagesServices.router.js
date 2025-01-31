@@ -10,6 +10,8 @@ export const createImagesServiceRouter = ({ imagesServiceModel }) => {
   const imagesServiceController = new ImagesServiceController({ Model: imagesServiceModel, Schema: imagesServiceSchema });
 
   imagesServiceRouter.get('/', imagesServiceController.getAll);
+  imagesServiceRouter.get('/filter', imagesServiceController.getByFilter);
+  imagesServiceRouter.put('/updatebyservice', uploadMultipleImagesMiddleware, imagesServiceController.updateByService);
   imagesServiceRouter.post('/', uploadMultipleImagesMiddleware, imagesServiceController.create);
 
   imagesServiceRouter.get('/:id', imagesServiceController.getById);

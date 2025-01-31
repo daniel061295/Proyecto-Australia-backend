@@ -53,4 +53,21 @@ export class BaseModel extends Model {
       return { status: false, message: error.message };
     }
   }
+
+  static async getByFilter({ column, id }) {
+    const attributes = await this.getAttributes();
+    if (!attributes[column]) {
+      return { status: false, message: `The column '${column}' does not exist` };
+    }
+    try {
+      const record = await this.findAll({
+        where: { [column]: id },
+
+      });
+      if (record.length > 0) return { status: true, result: record };
+      return { status: false, message: `No meetings found for the specified ${column}!` };
+    } catch (error) {
+      return { status: false, message: error };
+    }
+  }
 }

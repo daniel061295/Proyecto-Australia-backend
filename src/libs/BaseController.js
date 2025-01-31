@@ -120,4 +120,11 @@ export class BaseController {
       return res.status(500).json({ error: 'Internal server error.' });
     }
   };
+  getByFilter = async (req, res) => {
+    const column = Object.keys(req.query)[0];
+    const id = req.query[column];
+    const { status, result, message } = await this.Model.getByFilter({ column, id });
+    if (status) return res.json(result);
+    res.status(404).json({ message: `Error: ${message}` });
+  };
 }
