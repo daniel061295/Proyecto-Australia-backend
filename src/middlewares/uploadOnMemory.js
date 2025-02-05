@@ -7,7 +7,7 @@ export const uploadDocumentOnMemoryMiddleware = (req, res, next) => {
   upload.single("file")(req, res, async (err) => {
 
     if (err) {
-      return res.status(500).json({ error: "Error al cargar el archivo: " + err.message });
+      return res.status(500).json({ message: "Error al cargar el archivo: " + err.message });
     }
 
     const folderId = FOLDERID; // ID de la carpeta en Google Drive
@@ -17,7 +17,7 @@ export const uploadDocumentOnMemoryMiddleware = (req, res, next) => {
 
       if (!req.file) {
         next();
-        // return res.status(400).json({ error: "No se proporcionó ningún archivo." });
+        // return res.status(400).json({ message: "No se proporcionó ningún archivo." });
       } else {
 
 
@@ -42,7 +42,7 @@ export const uploadDocumentOnMemoryMiddleware = (req, res, next) => {
       }
     } catch (error) {
       console.error("Error al subir archivo a Google Drive:", error);
-      res.status(500).json({ error: "Error al subir archivo a Google Drive: " + error.message });
+      res.status(500).json({ message: "Error al subir archivo a Google Drive: " + error.message });
     }
   });
 };

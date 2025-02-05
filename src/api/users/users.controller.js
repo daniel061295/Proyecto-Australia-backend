@@ -9,7 +9,7 @@ export class UserController extends BaseController {
   create = async (req, res) => {
     const validationResult = this.Schema.validate(req.body);
     if (!validationResult.success) {
-      return res.status(422).json({ error: JSON.parse(validationResult.error.message) });
+      return res.status(422).json({ message: JSON.parse(validationResult.error.message) });
     }
 
     const { status, result } = await this.Model.createNew({
@@ -20,6 +20,44 @@ export class UserController extends BaseController {
     });
     if (status) return res.status(201).json({ message: 'User successfully created' });
     res.status(500).json({ message: `Error on create method: ${result}` });
+  };
+
+  update = async (req, res) => {
+    const validationResult = this.Schema.validatePartial(req.body);
+
+    if (!validationResult.success) {
+      return res.status(400).json({ message: JSON.parse(validationResult.error.message) });
+    }
+    const { id } = req.params;
+
+    const { status, result, message } = await this.Model.updateByPk({
+      id,
+      input: (validationResult.data.passwordUser === '')
+        ? (() => {
+          const { passwordUser, ...dataWithoutPassword } = validationResult.data;
+          return dataWithoutPassword;
+        })()
+        : {
+          ...validationResult.data,
+          passwordUser: await bcrypt.hash(validationResult.data.passwordUser, 10)
+        }
+    });
+
+    if (status) return res.status(201).json(result);
+    if (message) return res.status(404).json({ message });
+    res.status(500).json({ message: `Error on update method: ${result}` });
+  };
+
+
+  getAll = async (req, res) => {
+    const { status, result, message } = await this.Model.getAll();
+    if (!status) return res.status(500).json({ message: `Error on get method: ${message}` });
+    const usersWithoutPassword = result.map(user => {
+      const { passwordUser, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    });
+    return res.json(usersWithoutPassword);
+
   };
 
   getById = async (req, res) => {
@@ -42,7 +80,7 @@ export class UserController extends BaseController {
     const validationResult = loginUserSchema.validate(req.body);
     if (!validationResult.success) {
       return res.status(422).json({
-        error: JSON.parse(validationResult.error.message)
+        message: JSON.parse(validationResult.error.message)
       });
     }
     const { nameUser, passwordUser } = validationResult.data;

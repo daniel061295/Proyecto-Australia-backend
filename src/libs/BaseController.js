@@ -23,7 +23,7 @@ export class BaseController {
   create = async (req, res) => {
     const validationResult = this.Schema.validate(req.body);
     if (!validationResult.success) {
-      return res.status(422).json({ error: JSON.parse(validationResult.error.message) });
+      return res.status(422).json({ message: JSON.parse(validationResult.error.message) });
     }
     const { status, result, message } = await this.Model.createNew({ input: validationResult.data });
     if (status) return res.status(201).json(result);
@@ -46,7 +46,7 @@ export class BaseController {
     const validationResult = this.Schema.validatePartial(req.body);
 
     if (!validationResult.success) {
-      return res.status(400).json({ error: JSON.parse(validationResult.error.message) });
+      return res.status(400).json({ message: JSON.parse(validationResult.error.message) });
     }
 
     const { id } = req.params;
@@ -77,7 +77,7 @@ export class BaseController {
 
     } catch (error) {
       console.error(`Error in delete handler: ${error.message}`);
-      return res.status(500).json({ error: 'Internal server error.' });
+      return res.status(500).json({ message: 'Internal server error.' });
     }
   };
 
@@ -86,7 +86,7 @@ export class BaseController {
 
     const fileResult = await deleteFile(filePath);
     if (!fileResult.success && fileResult.errorCode !== 'ENOENT') {
-      return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ error: 'Error deleting the file.' });
+      return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ message: 'Error deleting the file.' });
     }
   };
 
@@ -99,7 +99,7 @@ export class BaseController {
       }
       const validationResult = this.Schema.validatePartial(req.body);
       if (!validationResult.success) {
-        return res.status(400).json({ error: JSON.parse(validationResult.error.message) });
+        return res.status(400).json({ message: JSON.parse(validationResult.error.message) });
       }
       let payload = validationResult.data;
 
@@ -117,7 +117,7 @@ export class BaseController {
 
     } catch (error) {
       console.error(`Error in update handler: ${error.message}`);
-      return res.status(500).json({ error: 'Internal server error.' });
+      return res.status(500).json({ message: 'Internal server error.' });
     }
   };
   getByFilter = async (req, res) => {
@@ -125,6 +125,6 @@ export class BaseController {
     const id = req.query[column];
     const { status, result, message } = await this.Model.getByFilter({ column, id });
     if (status) return res.json(result);
-    res.status(404).json({ message: `Error: ${message}` });
+    res.status(404).json({ message: `message: ${message}` });
   };
 }

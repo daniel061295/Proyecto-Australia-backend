@@ -5,11 +5,11 @@ export class ImagesServiceController extends BaseController {
   create = async (req, res) => {
     const validationResult = this.Schema.validate(req.body);
     if (!validationResult.success) {
-      return res.status(422).json({ error: JSON.parse(validationResult.error.message) });
+      return res.status(422).json({ message: JSON.parse(validationResult.error.message) });
     }
 
     if (!req.files || req.files.length === 0) {
-      return res.status(422).json({ error: 'No files uploaded' });
+      return res.status(422).json({ message: 'No files uploaded' });
     }
 
     try {
@@ -48,7 +48,7 @@ export class ImagesServiceController extends BaseController {
         const errorMessage = fileResult.errorCode === 'ENOENT'
           ? 'File not found!'
           : 'Error deleting the file.';
-        return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ error: errorMessage });
+        return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ message: errorMessage });
       }
 
       const { status, message } = await this.Model.delete({ id });
@@ -60,7 +60,7 @@ export class ImagesServiceController extends BaseController {
 
     } catch (error) {
       console.error(`Error in delete handler: ${error.message}`);
-      return res.status(500).json({ error: 'Internal server error.' });
+      return res.status(500).json({ message: 'Internal server error.' });
     }
   };
 
@@ -70,7 +70,7 @@ export class ImagesServiceController extends BaseController {
     try {
       const validationResult = this.Schema.validatePartial(req.body);
       if (!validationResult.success) {
-        return res.status(400).json({ error: JSON.parse(validationResult.error.message) });
+        return res.status(400).json({ message: JSON.parse(validationResult.error.message) });
       }
 
       let payload = validationResult.data;
@@ -87,7 +87,7 @@ export class ImagesServiceController extends BaseController {
             const errorMessage = fileResult.errorCode === 'ENOENT'
               ? 'File not found!'
               : 'Error deleting the file.';
-            return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ error: errorMessage });
+            return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ message: errorMessage });
           }
         }
 
@@ -103,18 +103,18 @@ export class ImagesServiceController extends BaseController {
 
     } catch (error) {
       console.error(`Error in update handler: ${error.message}`);
-      return res.status(500).json({ error: 'Internal server error.' });
+      return res.status(500).json({ message: 'Internal server error.' });
     }
   };
 
   updateByService = async (req, res) => {
 
     if (!req.files || req.files.length === 0) {
-      return res.status(422).json({ error: 'No files uploaded' });
+      return res.status(422).json({ message: 'No files uploaded' });
     }
     const validationResult = this.Schema.validatePartial(req.body);
     if (!validationResult.success) {
-      return res.status(400).json({ error: JSON.parse(validationResult.error.message) });
+      return res.status(400).json({ message: JSON.parse(validationResult.error.message) });
     }
     const { serviceId } = req.query;
     const { result } = await this.Model.getByFilter({ column: 'serviceId', id: serviceId });

@@ -10,18 +10,18 @@ export class MeetingController extends BaseController {
     const meetingWithClientSchema = new MeetingWithClientSchema;
     const validationResult = meetingWithClientSchema.validate(req.body);
     if (!validationResult.success) {
-      return res.status(422).json({ error: JSON.parse(validationResult.error.message) });
+      return res.status(422).json({ message: JSON.parse(validationResult.error.message) });
     }
 
     // if (!req.file) {
-    //   return res.status(422).json({ error: 'No file uploaded' })
+    //   return res.status(422).json({ message: 'No file uploaded' })
     // }
 
     const validatedData = validationResult.data;
     const client = await this.getOrCreateClient(validatedData);
-    const sameSchedule = await this.Model.getByFilter({ column: 'scheduleId', id: validatedData.scheduleId })
-    if (sameSchedule.status) {
-      return res.status(401).json({ error: 'This time slot is already booked' });
+    const someSchedule = await this.Model.getByFilter({ column: 'scheduleId', id: validatedData.scheduleId })
+    if (someSchedule.status && someSchedule.result[0]?.dataValues.schedule.dataValues.scheduleCount > 0) {
+      return res.status(401).json({ message: 'This time slot is already booked' });
     }
     const { status, result, message } = await this.Model.createNew({
       input: {
@@ -30,6 +30,7 @@ export class MeetingController extends BaseController {
         clientId: client.idClient,
         serviceId: validatedData.serviceId,
         documentUrlMeeting: req.file ? req.file.driveId : '',
+        descriptionMeeting: validatedData.descriptionMeeting ?? '',
       }
     });
     if (status) return res.status(201).json(result);
@@ -42,7 +43,7 @@ export class MeetingController extends BaseController {
     const id = req.query[column];
     const { status, result, message } = await this.Model.getByFilter({ column, id });
     if (status) return res.json(result);
-    res.status(404).json({ message: `Error: ${message}` });
+    res.status(404).json({ message: `message: ${message}` });
   };
 
   getByClientFilter = async (req, res) => {
@@ -50,7 +51,7 @@ export class MeetingController extends BaseController {
     const value = req.query[column];
     const { status, result, message } = await this.Model.getByClientFilter({ column, value });
     if (status) return res.json(result);
-    res.status(404).json({ message: `Error: ${message}` });
+    res.status(404).json({ message: `message: ${message}` });
   }
 
   delete = async (req, res) => {
@@ -69,7 +70,7 @@ export class MeetingController extends BaseController {
       //   const errorMessage = fileResult.errorCode === 'ENOENT'
       //     ? 'File not found!'
       //     : 'Error deleting the file.';
-      //   return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ error: errorMessage });
+      //   return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ message: errorMessage });
       // }
 
       const { status, message } = await this.Model.delete({ id });
@@ -81,7 +82,7 @@ export class MeetingController extends BaseController {
 
     } catch (error) {
       console.error(`Error in delete handler: ${error.message}`);
-      return res.status(500).json({ error: 'Internal server error.' });
+      return res.status(500).json({ message: 'Internal server error.' });
     }
   };
 
@@ -91,7 +92,7 @@ export class MeetingController extends BaseController {
     try {
       const validationResult = this.Schema.validatePartial(req.body);
       if (!validationResult.success) {
-        return res.status(400).json({ error: JSON.parse(validationResult.error.message) });
+        return res.status(400).json({ message: JSON.parse(validationResult.error.message) });
       }
 
       let payload = validationResult.data;
@@ -109,7 +110,7 @@ export class MeetingController extends BaseController {
             const errorMessage = fileResult.errorCode === 'ENOENT'
               ? 'File not found!'
               : 'Error deleting the file.';
-            return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ error: errorMessage });
+            return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ message: errorMessage });
           }
         }
 
@@ -124,7 +125,7 @@ export class MeetingController extends BaseController {
 
     } catch (error) {
       console.error(`Error in update handler: ${error.message}`);
-      return res.status(500).json({ error: 'Internal server error.' });
+      return res.status(500).json({ message: 'Internal server error.' });
     }
   };
 
@@ -161,7 +162,7 @@ export class MeetingController extends BaseController {
       fileStream.pipe(res);
     } catch (error) {
       console.error(`Error in getDocumentFromGoogleApi handler: ${error.message}`);
-      return res.status(500).json({ error: 'Internal server error.' });
+      return res.status(500).json({ message: 'Internal server error.' });
     }
   }
 }

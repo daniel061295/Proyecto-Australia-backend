@@ -7,10 +7,10 @@ export class ServiceController extends BaseController {
   create = async (req, res) => {
     const validationResult = this.Schema.validate(req.body);
     if (!validationResult.success) {
-      return res.status(422).json({ error: JSON.parse(validationResult.error.message) });
+      return res.status(422).json({ message: JSON.parse(validationResult.error.message) });
     }
     if (!req.file) {
-      return res.status(422).json({ error: 'No file uploaded' })
+      return res.status(422).json({ message: 'No file uploaded' })
     }
     const payload = {
       imageUrlService: req.file.path,
@@ -23,7 +23,7 @@ export class ServiceController extends BaseController {
   getByCategory = async (req, res) => {
     const { idCategory } = req.query;
     if (!idCategory) {
-      return res.status(400).json({ error: 'idCategory parameter is required' });
+      return res.status(400).json({ message: 'idCategory parameter is required' });
     }
     const { status, result } = await this.Model.getByCategory({ idCategory });
     if (status) return res.json(result);

@@ -7,10 +7,10 @@ export class CategoryController extends BaseController {
   create = async (req, res) => {
     const validationResult = this.Schema.validate(req.body);
     if (!validationResult.success) {
-      return res.status(422).json({ error: JSON.parse(validationResult.error.message) });
+      return res.status(422).json({ message: JSON.parse(validationResult.error.message) });
     }
     // if (!req.file) {
-    //   return res.status(422).json({ error: 'No file uploaded' })
+    //   return res.status(422).json({ message: 'No file uploaded' })
     // }
     const payload = {
       imageUrlCategory: req.file ? req.file.path : '',

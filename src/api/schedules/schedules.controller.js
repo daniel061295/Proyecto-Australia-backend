@@ -5,7 +5,7 @@ export class ScheduleController extends BaseController {
   getByDate = async (req, res) => {
     const { date } = req.query;
     if (!date) {
-      return res.status(400).json({ error: 'date parameter is required' });
+      return res.status(400).json({ message: 'date parameter is required' });
     }
     const { status, result, message } = await this.Model.getByDate({ dateString: date });
     if (status) return res.json(result);

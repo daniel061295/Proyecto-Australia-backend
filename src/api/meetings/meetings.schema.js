@@ -66,6 +66,9 @@ export class MeetingWithClientSchema {
       serviceId: numberOrString.refine((val) => !isNaN(val), {
         message: "serviceId must be a valid number"
       }),
+      descriptionMeeting: z.string({
+        invalid_type_error: 'descriptionMeeting must be a string'
+      }).optional()
     });
   }
   validate(input) {

@@ -44,9 +44,9 @@ const createUploadMiddleware = (destinationPath, filter) => {
         if (req.file) {
           if (err) {
             if (err.message === errorMessage) {
-              return res.status(400).json({ error: err.message });
+              return res.status(400).json({ message: err.message });
             }
-            return res.status(500).json({ error: "An unexpected error occurred while uploading the image: " + err.message });
+            return res.status(500).json({ message: "An unexpected error occurred while uploading the image: " + err.message });
           }
         }
         next();
@@ -58,9 +58,9 @@ const createUploadMiddleware = (destinationPath, filter) => {
         if (req.file) {
           if (err) {
             if (err.message === errorMessage) {
-              return res.status(400).json({ error: err.message });
+              return res.status(400).json({ message: err.message });
             }
-            return res.status(500).json({ error: "An unexpected error occurred while uploading the images: " + err.message });
+            return res.status(500).json({ message: "An unexpected error occurred while uploading the images: " + err.message });
           }
         }
         next();

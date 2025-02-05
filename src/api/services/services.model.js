@@ -4,6 +4,7 @@ import { sequelize } from '../../config/database.js';
 import { CategoryModel } from '../categories/categories.model.js';
 import { BaseModel } from '../../libs/BaseModel.js';
 import { StateModel } from '../states/states.model.js';
+import { ImagesServiceModel } from '../imagesServices/imagesServices.model.js';
 
 export class ServiceModel extends BaseModel {
   static getIncludes() {
@@ -24,11 +25,23 @@ export class ServiceModel extends BaseModel {
         attributes: { exclude: ['categoryId', 'stateId'] },
         include: this.getIncludes(),
       });
-      return { status: true, result: records };
+
+      const newRecords = await Promise.all(
+        records.map(async (item) => {
+          const images = await ImagesServiceModel.getByService({ idService: item.idService });
+          return { ...item.dataValues, images: images.result ?? [] }; // Crear un nuevo objeto
+        })
+      );
+
+      return {
+        status: true,
+        result: newRecords,
+      };
     } catch (error) {
       return { status: false, message: error.message };
     }
   }
+
   static async getById({ id }) {
     try {
       const service = await this.findByPk(id, {
