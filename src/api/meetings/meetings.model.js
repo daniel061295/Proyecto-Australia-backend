@@ -50,6 +50,7 @@ export class MeetingModel extends BaseModel {
   static async getAll() {
     try {
       const records = await this.findAll({
+        order: [['idMeeting', 'DESC']],
         attributes: ['idMeeting', 'documentUrlMeeting', 'descriptionMeeting'],
         include: this.getIncludes(),
       });

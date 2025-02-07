@@ -1,6 +1,8 @@
 /* eslint-disable space-before-function-paren */
 import { z } from 'zod';
 
+const TimeSlots = ["Half day (Morning)", "Half day (Afternoon)", "Full day",]
+
 export class ScheduleSchema {
   constructor() {
     this.scheduleSchema = z.object({
@@ -19,7 +21,8 @@ export class ScheduleSchema {
       idDate: z.number({
         invalid_type_error: 'idDate must be a number',
         required_error: 'idDate is required'
-      })
+      }),
+      scheduleTimeSlot: z.nativeEnum(TimeSlots)
     });
   }
 

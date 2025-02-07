@@ -82,6 +82,10 @@ ScheduleModel.init(
     idDate: {
       type: Sequelize.INTEGER,
       allowNull: false
+    },
+    scheduleTimeSlot: {
+      type: Sequelize.STRING,
+      allowNull: false
     }
   },
   {
