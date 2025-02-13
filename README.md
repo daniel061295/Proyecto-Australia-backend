@@ -13,12 +13,8 @@ This project is the backend service for the Australia application. It provides A
 
 ## Project Structure
 ```
-.
-├── .env
 ├── .gitattributes
-├── .gitignore
 ├── api_key.json
-├── build/
 ├── package.json
 ├── src/
 │   ├── api/
@@ -34,17 +30,16 @@ This project is the backend service for the Australia application. It provides A
 │   │   ├── states/
 │   │   ├── submenus/
 │   │   └── users/
-│   ├── app.js
-│   ├── config/
-│   │   ├── database.js
-│   │   └── config.js
-│   ├── index.js
 │   ├── libs/
-│   │   ├── BaseController.js
-│   │   └── BaseModel.js
-│   ├── models/
+|   |   ├── models/
+|   |   ├── services/
+|   |   └── utils/
+│   ├── config/
 │   ├── middlewares/
-│   └── static/
+│   ├── static/
+|   ├── config.js
+|   ├── app.js
+|   └── index.js
 ```
 
 ## Technologies Used
