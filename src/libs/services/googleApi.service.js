@@ -25,7 +25,6 @@ export const authorizeOAuth2Client = async () => {
     GOOGLE_API_REDIRECT_URI
   )
   await oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
-
   return oAuth2Client;
 }
 
@@ -58,7 +57,6 @@ export const uploadFile = async (authClient, file, folderId) => {
 };
 
 export const listFiles = async (authClient, folderId) => {
-
   const drive = google.drive({ version: "v3", auth: authClient });
   const res = await drive.files.list({
     q: `'${folderId}' in parents`, // Filtra por la carpeta
@@ -87,3 +85,18 @@ export const downloadFile = async (authClient, fileId) => {
   );
   return res.data;
 }
+
+export const deleteFile = async (authClient, fileId) => {
+  const drive = google.drive({ version: "v3", auth: authClient });
+
+  try {
+    await drive.files.delete({
+      fileId: fileId,
+    });
+    console.log(`File with ID: ${fileId} has been deleted successfully.`);
+    return true; // Indica que el archivo fue eliminado correctamente
+  } catch (err) {
+    console.error(`Error deleting file: ${err}`);
+    throw err; // Lanza el error para que pueda ser manejado por el llamador
+  }
+};

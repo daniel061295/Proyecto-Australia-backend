@@ -9,7 +9,6 @@ export const uploadDocumentOnMemoryMiddleware = (req, res, next) => {
     if (err) {
       return res.status(500).json({ message: "Error al cargar el archivo: " + err.message });
     }
-
     const folderId = FOLDERID; // ID de la carpeta en Google Drive
 
     try {
@@ -19,10 +18,7 @@ export const uploadDocumentOnMemoryMiddleware = (req, res, next) => {
         next();
         // return res.status(400).json({ message: "No se proporcionó ningún archivo." });
       } else {
-
-
         const file = req.file;
-
         const authClient = await authorize();
         // Convertimos el buffer en un Readable Stream
         const stream = new Readable();

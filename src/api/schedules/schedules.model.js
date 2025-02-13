@@ -57,6 +57,36 @@ export class ScheduleModel extends BaseModel {
     }
   }
 
+  static async getById({ id }) {
+    try {
+      const schedule = await this.findByPk(id, {
+        include: [
+          {
+            model: DateModel,
+            as: "date",
+          }
+        ]
+      });
+      // console.log(schedule)
+      return (schedule.dataValues)
+      // if (schedule) return {
+      //   status: true, result: await schedule.map(
+      //     (item) => {
+      //       const { idDate, date, ...filteredDataValues } = item.dataValues;
+      //       const output = {
+      //         ...filteredDataValues,
+      //         date: date.dateString
+      //       }
+      //       return output;
+      //     }
+      //   )
+      // };
+      // return { status: false, message: 'No records found for the specified input!' };
+    } catch (error) {
+      return { status: false, message: error };
+    }
+  }
+
 
 }
 ScheduleModel.init(

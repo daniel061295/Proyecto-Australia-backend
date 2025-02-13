@@ -2,22 +2,28 @@
 import { BaseController } from '../../libs/BaseController.js';
 import { MeetingWithClientSchema } from './meetings.schema.js'
 import { ClientModel } from '../clients/clients.model.js';
-import { deleteFile } from '../../libs/utils/deleteFile.js';
-import { authorize, downloadFile } from '../../libs/services/googleApi.service.js';
+// import { deleteFile } from '../../libs/utils/deleteFile.js';
+import { authorize, downloadFile, deleteFile } from '../../libs/services/googleApi.service.js';
+
+import { ScheduleModel } from '../schedules/schedules.model.js';
 
 export class MeetingController extends BaseController {
   createMeetingWithClient = async (req, res) => {
+    // req.file ? console.log(req.file) : console.log('No file uploaded!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+
     const meetingWithClientSchema = new MeetingWithClientSchema;
     const validationResult = meetingWithClientSchema.validate(req.body);
     if (!validationResult.success) {
       return res.status(422).json({ message: JSON.parse(validationResult.error.message) });
     }
 
-    // if (!req.file) {
-    //   return res.status(422).json({ message: 'No file uploaded' })
-    // }
-
     const validatedData = validationResult.data;
+    // console.log(validatedData.scheduleId);
+    const schedule = await ScheduleModel.getById({ id: validatedData.scheduleId })
+    // console.log(schedule.date.dataValues.isActive);
+    if (!schedule.date?.dataValues.isActive) {
+      return res.status(400).json({ message: 'Date sent is not active' })
+    }
     const client = await this.getOrCreateClient(validatedData);
     const someSchedule = await this.Model.getByFilter({ column: 'scheduleId', id: validatedData.scheduleId })
     if (someSchedule.status && someSchedule.result[0]?.dataValues.schedule.dataValues.scheduleCount > 0) {
@@ -64,18 +70,15 @@ export class MeetingController extends BaseController {
 
       const { documentUrlMeeting } = byId.result;
 
-      const fileResult = documentUrlMeeting ? await deleteFile(documentUrlMeeting) : '';
-
-      // if (!fileResult.success) {
-      //   const errorMessage = fileResult.errorCode === 'ENOENT'
-      //     ? 'File not found!'
-      //     : 'Error deleting the file.';
-      //   return res.status(fileResult.errorCode === 'ENOENT' ? 404 : 500).json({ message: errorMessage });
-      // }
+      // const fileResult = documentUrlMeeting ? await deleteFile(documentUrlMeeting) : '';
 
       const { status, message } = await this.Model.delete({ id });
       if (!status) {
         return res.status(404).json({ message });
+      }
+      if (documentUrlMeeting) {
+        const authClient = await authorize()
+        await deleteFile(authClient, documentUrlMeeting);
       }
 
       return res.status(200).json({ message });
@@ -165,4 +168,5 @@ export class MeetingController extends BaseController {
       return res.status(500).json({ message: 'Internal server error.' });
     }
   }
+
 }

@@ -39,5 +39,4 @@ app.use('/menus', createMenuRouter({ menuModel: MenuModel }));
 app.use('/users', createUserRouter({ userModel: UserModel }));
 app.use('/dates', createDateRouter({ dateModel: DateModel }));
 
-
 export { app };

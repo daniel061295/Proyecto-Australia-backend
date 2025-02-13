@@ -9,6 +9,8 @@ export const createDateRouter = ({ dateModel }) => {
   const dateController = new DateController({ Model: dateModel, Schema: dateSchema });
 
   dateRouter.get('/', dateController.getAll);
+  dateRouter.get('/newDate', dateController.createNewDate);
+
   dateRouter.post('/', dateController.create);
 
   dateRouter.get('/:id', dateController.getById);
