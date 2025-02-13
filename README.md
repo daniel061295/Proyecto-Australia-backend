@@ -12,8 +12,40 @@ This project is the backend service for the Australia application. It provides A
 - Error handling and logging
 
 ## Project Structure
-
-.env .gitattributes .gitignore api_key.json build/ package.json src/ api/ categories/ clients/ dates/ imagesServices/ meetings/ menus/ profiles/ schedules/ services/ states/ submenus/ users/ src/app.js config/ src/config/database.js src/config.js src/index.js libs/ src/libs/BaseController.js src/libs/BaseModel.js models/ ... middlewares/ ... static/ 10enero.jpeg 15enero.jpeg docs/ foto_documento_fondo_blanco_3_4.jpg foto_documento_fondo_blanco.png foto_fondo_blanco.jpg lumina-logo.png
+```
+.
+├── .env
+├── .gitattributes
+├── .gitignore
+├── api_key.json
+├── build/
+├── package.json
+├── src/
+│   ├── api/
+│   │   ├── categories/
+│   │   ├── clients/
+│   │   ├── dates/
+│   │   ├── imagesServices/
+│   │   ├── meetings/
+│   │   ├── menus/
+│   │   ├── profiles/
+│   │   ├── schedules/
+│   │   ├── services/
+│   │   ├── states/
+│   │   ├── submenus/
+│   │   └── users/
+│   ├── app.js
+│   ├── config/
+│   │   ├── database.js
+│   │   └── config.js
+│   ├── index.js
+│   ├── libs/
+│   │   ├── BaseController.js
+│   │   └── BaseModel.js
+│   ├── models/
+│   ├── middlewares/
+│   └── static/
+```
 
 ## Technologies Used
 
