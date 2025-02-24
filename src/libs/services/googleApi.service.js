@@ -2,7 +2,8 @@ import fs from "fs";
 import { google } from "googleapis";
 import googleApiKey from "../../../api_key.json" assert { type: "json" };
 import { FOLDERID, GOOGLE_API_CLIENT_ID, GOOGLE_API_CLIENT_SECRET, GOOGLE_API_REDIRECT_URI, REFRESH_TOKEN } from '../../config.js'
-
+import archiver from 'archiver';
+import { PassThrough } from 'stream';
 
 const SCOPE = ['https://www.googleapis.com/auth/drive'];
 
@@ -59,8 +60,7 @@ export const uploadFile = async (authClient, file, folderId) => {
 export const listFiles = async (authClient, folderId) => {
   const drive = google.drive({ version: "v3", auth: authClient });
   const res = await drive.files.list({
-    q: `'${folderId}' in parents`, // Filtra por la carpeta
-    // fields: "files(id, name, parents)",
+    q: `'${folderId}' in parents`,
   });
 
   const files = res.data.files;
@@ -74,16 +74,14 @@ export const listFiles = async (authClient, folderId) => {
 export const downloadFile = async (authClient, fileId) => {
   const drive = google.drive({ version: "v3", auth: authClient });
 
-  // Get file metadata to retrieve the file name
-  const fileMetadata = await drive.files.get({ fileId });
+  const fileMetadata = await drive.files.get({ fileId, fields: 'name', });
   const fileName = fileMetadata.data.name;
 
-  // Download the file
   const res = await drive.files.get(
     { fileId, alt: "media" },
     { responseType: "stream" }
   );
-  return res.data;
+  return { fileStream: res.data, fileName };
 }
 
 export const deleteFile = async (authClient, fileId) => {
@@ -98,5 +96,45 @@ export const deleteFile = async (authClient, fileId) => {
   } catch (err) {
     console.error(`Error deleting file: ${err}`);
     throw err; // Lanza el error para que pueda ser manejado por el llamador
+  }
+};
+
+export const downloadFilesAndCompress = async (authClient, fileIds) => {
+  const drive = google.drive({ version: "v3", auth: authClient });
+
+  const zipStream = new PassThrough();
+  const archive = archiver('zip', {
+    zlib: { level: 9 }
+  });
+
+  archive.pipe(zipStream);
+
+  const downloadAndAddToZip = async (fileId) => {
+    try {
+      const fileMetadata = await drive.files.get({
+        fileId,
+        fields: 'name',
+      });
+      const fileName = fileMetadata.data.name;
+      const res = await drive.files.get(
+        { fileId, alt: "media" },
+        { responseType: "stream" }
+      );
+
+      archive.append(res.data, { name: fileName });
+    } catch (error) {
+      console.error(`Error al descargar el archivo con ID ${fileId}`, error);
+      throw error;
+    }
+  };
+
+  try {
+    await Promise.all(fileIds.map((fileId) => downloadAndAddToZip(fileId)));
+    await archive.finalize();
+
+    return zipStream;
+  } catch (error) {
+    console.error('Error al descargar y comprimir los archivos', error);
+    throw error;
   }
 };

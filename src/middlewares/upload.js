@@ -1,7 +1,6 @@
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import { vectortile_v1 } from "googleapis";
 
 const errorMessage = "Invalid file format. Only JPEG, PNG, and GIF are allowed.";
 

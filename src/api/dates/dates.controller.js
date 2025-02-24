@@ -8,8 +8,10 @@ export class DateController extends BaseController {
       const actualDate = new Date();
       actualDate.setDate(actualDate.getDate() + 30);
       const { status, result, message } = await this.Model.createNew({ input: { dateString: actualDate.toISOString().split('T')[0], isActive: true } });
-      if (status) return res.status(201).json(result);
-      res.status(500).json({ message: `Error on create method: ${message}` });
+      console.log(actualDate.toISOString().split('T')[0]);
+      if (!status) return res.status(500).json({ message: `Error on create method: ${message}` });
+      return res.status(201).json(result);
+
     } catch (error) {
       console.log(error)
     }

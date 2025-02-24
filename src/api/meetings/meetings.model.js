@@ -140,7 +140,7 @@ MeetingModel.init(
       allowNull: true
     },
     descriptionMeeting: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
       allowNull: true
     }
   },

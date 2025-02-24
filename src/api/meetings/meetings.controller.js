@@ -2,15 +2,12 @@
 import { BaseController } from '../../libs/BaseController.js';
 import { MeetingWithClientSchema } from './meetings.schema.js'
 import { ClientModel } from '../clients/clients.model.js';
-// import { deleteFile } from '../../libs/utils/deleteFile.js';
-import { authorize, downloadFile, deleteFile } from '../../libs/services/googleApi.service.js';
+import { authorize, downloadFile, deleteFile, downloadFilesAndCompress } from '../../libs/services/googleApi.service.js';
 
 import { ScheduleModel } from '../schedules/schedules.model.js';
 
 export class MeetingController extends BaseController {
   createMeetingWithClient = async (req, res) => {
-    // req.file ? console.log(req.file) : console.log('No file uploaded!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-
     const meetingWithClientSchema = new MeetingWithClientSchema;
     const validationResult = meetingWithClientSchema.validate(req.body);
     if (!validationResult.success) {
@@ -18,9 +15,7 @@ export class MeetingController extends BaseController {
     }
 
     const validatedData = validationResult.data;
-    // console.log(validatedData.scheduleId);
     const schedule = await ScheduleModel.getById({ id: validatedData.scheduleId })
-    // console.log(schedule.date.dataValues.isActive);
     if (!schedule.date?.dataValues.isActive) {
       return res.status(400).json({ message: 'Date sent is not active' })
     }
@@ -35,7 +30,7 @@ export class MeetingController extends BaseController {
         stateId: validatedData.stateId,
         clientId: client.idClient,
         serviceId: validatedData.serviceId,
-        documentUrlMeeting: req.file ? req.file.driveId : '',
+        documentUrlMeeting: req.files ? JSON.stringify(req.ids) : '',
         descriptionMeeting: validatedData.descriptionMeeting ?? '',
       }
     });
@@ -67,11 +62,7 @@ export class MeetingController extends BaseController {
       if (!byId.status) {
         return res.status(404).json({ message: `Object with id: ${id} not found` });
       }
-
       const { documentUrlMeeting } = byId.result;
-
-      // const fileResult = documentUrlMeeting ? await deleteFile(documentUrlMeeting) : '';
-
       const { status, message } = await this.Model.delete({ id });
       if (!status) {
         return res.status(404).json({ message });
@@ -156,8 +147,8 @@ export class MeetingController extends BaseController {
     }
     try {
       const authClient = await authorize();
-      const fileStream = await downloadFile(authClient, result.dataValues.documentUrlMeeting);
-      res.setHeader('Content-Disposition', `attachment; filename="${result.dataValues.documentUrlMeeting}"`);
+      const { fileStream, fileName } = await downloadFile(authClient, result.dataValues.documentUrlMeeting);
+      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
       res.setHeader('Content-Type', 'application/octet-stream');
       fileStream.on('end', () => {
         res.end();
@@ -167,6 +158,65 @@ export class MeetingController extends BaseController {
       console.error(`Error in getDocumentFromGoogleApi handler: ${error.message}`);
       return res.status(500).json({ message: 'Internal server error.' });
     }
+  }
+  getDocumentFromGoogleApiByCode = async (req, res) => {
+    const { id, code } = req.query;
+    const { status, result, message } = await this.Model.getById({ id });
+    if (!status) {
+      return res.status(404).json({ message });
+    }
+    let codeArray
+    try {
+      codeArray = JSON.parse(result.dataValues.documentUrlMeeting);
+    } catch {
+      codeArray = [result.dataValues.documentUrlMeeting];
+    }
+    if (!codeArray.includes(code)) {
+      return res.status(404).json({ message: 'Code not found' });
+    }
+    try {
+      const authClient = await authorize();
+      const { fileStream, fileName } = await downloadFile(authClient, code);
+      res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+      res.setHeader('Content-Type', 'application/octet-stream');
+      fileStream.on('end', () => {
+        res.end();
+      });
+      fileStream.pipe(res);
+    } catch (error) {
+      console.error(`Error in getDocumentFromGoogleApi handler: ${error.message}`);
+      return res.status(500).json({ message: 'Internal server error.' });
+    }
+  }
+
+  getDocumentsOnZip = async (req, res) => {
+    const { id } = req.params;
+    const { status, result, message } = await this.Model.getById({ id });
+    if (!status) {
+      return res.status(404).json({ message });
+    }
+    let fileIds
+    try {
+      fileIds = JSON.parse(result.dataValues.documentUrlMeeting);
+    } catch {
+      fileIds = [result.dataValues.documentUrlMeeting];
+    }
+    const authClient = await authorize();
+    if (fileIds.length === 0) return res.status(404).json({ message: 'No documents found' });
+    try {
+      const zipStream = await downloadFilesAndCompress(authClient, fileIds);
+
+      // Configurar las cabeceras de la respuesta
+      res.setHeader('Content-Type', 'application/zip');
+      res.setHeader('Content-Disposition', 'attachment; filename="archivos_comprimidos.zip"');
+
+      // Enviar el stream del archivo ZIP al cliente
+      zipStream.pipe(res);
+    } catch (error) {
+      console.error('Error al descargar y comprimir los archivos:', error);
+      res.status(500).send('Error al descargar y comprimir los archivos');
+    }
+
   }
 
 }
